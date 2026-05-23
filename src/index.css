@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+
+/* =========================
+   GLOBAL CSS VARIABLES
+========================= */
+
+:root {
+  --primary: #104a17;
+
+  /* Shades */
+  --primary-50: #eef8ef;
+  --primary-100: #d7edd9;
+  --primary-200: #b3d8b7;
+  --primary-300: #86be8c;
+  --primary-400: #5ba364;
+  --primary-500: #2f7c39;
+  --primary-600: #104a17;
+  --primary-700: #0c3b12;
+  --primary-800: #082b0d;
+  --primary-900: #041807;
+
+  /* Extra */
+  --sidebar-bg: #0b1f0e;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --danger: #ef4444;
+
+  --shadow-primary: 0 10px 25px rgba(16, 74, 23, 0.18);
+}
