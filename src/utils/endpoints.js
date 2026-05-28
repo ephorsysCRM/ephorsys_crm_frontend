@@ -1,0 +1,1 @@
+export const  EMPLOYEE_API_END_POINT="http://localhost:8800/api/v1/employee" //Employee api end point
