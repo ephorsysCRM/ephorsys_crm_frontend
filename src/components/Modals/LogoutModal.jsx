@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
-import { logOutAdmin } from "../../redux/features/auth/authThunk";
-
+import { logout } from "../../redux/authSlice";
 
 const LogoutModal = ({ onClose }) => {
   // ==================================================
@@ -14,24 +13,21 @@ const LogoutModal = ({ onClose }) => {
   // ==================================================
 
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   // ==================================================
   // Redux State
   // ==================================================
 
-  const { loading } = useSelector(
-    (state) => state.auth
-  );
+  // (Optional: remove loading if not needed, or fallback to false if undefined)
+  const loading = false; 
 
   // ==================================================
   // Handle Logout
   // ==================================================
 
-  const handleLogout = async () => {
-    await dispatch(logOutAdmin());
-
+  const handleLogout = () => {
+    dispatch(logout());
     navigate("/");
   };
 

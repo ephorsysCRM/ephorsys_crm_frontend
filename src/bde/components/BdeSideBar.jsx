@@ -9,6 +9,9 @@ import {
 
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import Modal from "../../components/ui/Modal";
+import LogoutModal from "../../components/Modals/LogoutModal";
 
 const NAV_ITEMS = [
   {
@@ -34,6 +37,8 @@ const NAV_ITEMS = [
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+  const [logoutOpen, setLogoutOpen] = useState(false);
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -142,6 +147,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
+            onClick={() => setLogoutOpen(true)}
             className="
               w-full flex items-center justify-center gap-3
               py-2 rounded-2xl cursor-pointer
@@ -155,6 +161,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             Logout
           </motion.button>
         </div>
+
+        {/* Logout Modal */}
+        <Modal
+          isOpen={logoutOpen}
+          onClose={() => setLogoutOpen(false)}
+          title="Logout"
+          size="sm"
+        >
+          <LogoutModal
+            onClose={() => setLogoutOpen(false)}
+          />
+        </Modal>
       </aside>
     </>
   );
