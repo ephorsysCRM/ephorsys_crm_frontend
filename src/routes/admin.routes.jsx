@@ -6,7 +6,7 @@ import Lead from "../admin/pages/Lead";
 import Employees from "../admin/pages/Employees";
 
 const AdminRoutes = (
-  <Route element={<ProtectedRoute />}>
+  <Route element={<ProtectedRoute allowedRole="admin" />}>
     <Route path="/admin" element={<AdminLayout />}>
       <Route path="dashboard" element={<AdminDashboard />} />
       <Route path="leads" element={<Lead />} />

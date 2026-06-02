@@ -5,7 +5,7 @@ import BdeDashboard from "../bde/pages/BdeDashboard";
 import Lead from "../bde/pages/Lead";
 
 const BdeRoutes = (
-  <Route element={<ProtectedRoute />}>
+  <Route element={<ProtectedRoute allowedRole="employee" />}>
     <Route path="/bde" element={<BdeLayout />}>
       <Route path="dashboard" element={<BdeDashboard />} />
       <Route path="leads" element={<Lead />} />

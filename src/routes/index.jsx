@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "../auth/LoginPage";
+import LoginPage from "../pages/auth/Login";
 import AdminRoutes from "./admin.routes";
 import BdeRoutes from "./bde.routes";
 import NotFound from "../pages/NotFound";
-
+  
 const AppRoutes = () => {
   return (
     <BrowserRouter>
