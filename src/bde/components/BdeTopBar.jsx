@@ -9,9 +9,21 @@ import {
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../redux/authSlice";
 
 const TopBar = ({ setSidebarOpen }) => {
   const [profileOpen, setProfileOpen] = useState(false);
+  
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -178,7 +190,7 @@ const TopBar = ({ setSidebarOpen }) => {
             {/* User Info */}
             <div className="hidden sm:block text-right">
               <p className="text-[13px] font-medium text-slate-800 leading-tight">
-                Manoj
+                {user?.firstName || user?.name || "User"}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider text-slate-400 leading-tight">
@@ -252,11 +264,11 @@ const TopBar = ({ setSidebarOpen }) => {
 
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      Manoj Kumar
+                      {user?.firstName} {user?.lastName}
                     </p>
 
-                    <p className="text-xs text-slate-400 capitalize">
-                      Business Development Executive
+                    <p className="text-xs text-slate-400">
+                      {user?.officialEmail || "bde@company.com"}
                     </p>
                   </div>
                 </div>
@@ -290,6 +302,7 @@ const TopBar = ({ setSidebarOpen }) => {
                 {/* Logout */}
                 <div className="border-t border-slate-100 p-1.5">
                   <motion.button
+                    onClick={handleLogout}
                     whileHover={{
                       backgroundColor: "#fef2f2",
                     }}
