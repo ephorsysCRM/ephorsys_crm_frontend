@@ -24,16 +24,6 @@ const NAV_ITEMS = [
     label: "Leads",
     icon: Users,
   },
-  {
-    path: "/bde/employees",
-    label: "Employees",
-    icon: BriefcaseBusiness,
-  },
-  {
-    path: "/bde/reports",
-    label: "Reports",
-    icon: BarChart3,
-  },
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {

@@ -1,500 +1,283 @@
-// import { useState } from "react";
-// import axios from "axios";
-// import { EMPLOYEE_API_END_POINT } from "../../utils/endpoints";
+import { useState, useEffect } from "react";
+import { Users, Loader2, User, Phone, Mail, Building, XCircle, TrendingUp, PhoneCall, ListTodo, AlertCircle, Trophy } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from "../../services/api";
+import toast from "react-hot-toast";
 
+// Helper component for the Metric Cards in the Performance Modal
+const MetricCard = ({ title, value, icon, bgClass, textClass }) => (
+  <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+    <div className={`p-3 rounded-xl ${bgClass} ${textClass}`}>{icon}</div>
+    <div>
+      <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">{title}</p>
+      <h3 className="text-2xl font-black text-slate-800">{value}</h3>
+    </div>
+  </div>
+);
 
+const EmployeePerformanceModal = ({ employee, onClose }) => {
+  const [loading, setLoading] = useState(true);
+  const [performance, setPerformance] = useState(null);
 
-// const initialForm = {
-//   employeeId: "",
-//   firstName: "",
-//   middleName: "",
-//   lastName: "",
-//   gender: "",
-//   dateOfBirth: "",
-//   maritalStatus: "",
-//   bloodGroup: "",
-//   nationality: "",
-//   personalEmail: "",
-//   officialEmail: "",
-//   mobileNumber: "",
-//   alternateMobileNumber: "",
-//   emergencyContactName: "",
-//   emergencyContactNumber: "",
-//   currentAddress: "",
-//   permanentAddress: "",
-//   city: "",
-//   state: "",
-//   country: "",
-//   zipCode: "",
-//   department: "",
-//   designation: "",
-//   employeeType: "",
-//   workLocation: "",
-//   joiningDate: "",
-//   probationEndDate: "",
-//   shiftTiming: "",
-//   workMode: "",
-//   employmentStatus: "",
-//   salary: "",
-//   bankName: "",
-//   accountNumber: "",
-//   ifscCode: "",
-//   panNumber: "",
-//   password: "",
-// };
+  useEffect(() => {
+    const fetchPerformance = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/lead/performance/${employee._id}`);
+        if (res.data.success) {
+          setPerformance(res.data.data);
+        }
+      } catch (err) {
+        toast.error("Failed to fetch employee performance.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (employee?._id) fetchPerformance();
+  }, [employee]);
 
-// const Input = ({ label, ...props }) => (
-//   <div>
-//     <label className="mb-1 block text-sm font-medium text-gray-700">
-//       {label}
-//     </label>
-//     <input
-//       {...props}
-//       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-//     />
-//   </div>
-// );
-
-// const Select = ({ label, children, ...props }) => (
-//   <div>
-//     <label className="mb-1 block text-sm font-medium text-gray-700">
-//       {label}
-//     </label>
-//     <select
-//       {...props}
-//       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-//     >
-//       {children}
-//     </select>
-//   </div>
-// );
-
-// const TextArea = ({ label, ...props }) => (
-//   <div>
-//     <label className="mb-1 block text-sm font-medium text-gray-700">
-//       {label}
-//     </label>
-//     <textarea
-//       {...props}
-//       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-//     />
-//   </div>
-// );
-
-// const Section = ({ title, children }) => (
-//   <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-//     <h3 className="mb-5 text-lg font-semibold text-gray-900">{title}</h3>
-//     {children}
-//   </div>
-// );
-
-// export default function RegisterEmployee() {
-//   const [form, setForm] = useState(initialForm);
-//   const [profilePhoto, setProfilePhoto] = useState(null);
-//   const [passportPhoto, setPassportPhoto] = useState(null);
-//   const [documents, setDocuments] = useState({});
-
-//   const [education, setEducation] = useState([
-//     {
-//       qualification: "",
-//       university: "",
-//       passingYear: "",
-//       percentage: "",
-//       specialization: "",
-//     },
-//   ]);
-
-//   const [experience, setExperience] = useState([
-//     {
-//       companyName: "",
-//       designation: "",
-//       startDate: "",
-//       endDate: "",
-//       totalExperience: "",
-//       skillsUsed: "",
-//       reasonForLeaving: "",
-//     },
-//   ]);
-
-//   const [loading, setLoading] = useState(false);
-//   const [success, setSuccess] = useState("");
-//   const [error, setError] = useState("");
-
-//   const handleChange = (e) => {
-//     setForm((prev) => ({
-//       ...prev,
-//       [e.target.name]: e.target.value,
-//     }));
-//   };
-
-//   const handleDocumentChange = (e) => {
-//     setDocuments((prev) => ({
-//       ...prev,
-//       [e.target.name]: e.target.files,
-//     }));
-//   };
-
-//   const updateEducation = (index, field, value) => {
-//     const copy = [...education];
-//     copy[index][field] = value;
-//     setEducation(copy);
-//   };
-
-//   const updateExperience = (index, field, value) => {
-//     const copy = [...experience];
-//     copy[index][field] = value;
-//     setExperience(copy);
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     setLoading(true);
-//     setSuccess("");
-//     setError("");
-
-//     try {
-//       const formData = new FormData();
-
-//       Object.entries(form).forEach(([key, value]) => {
-//         formData.append(key, value);
-//       });
-
-//       if (profilePhoto) {
-//         formData.append("profilePhoto", profilePhoto);
-//       }
-
-//       if (passportPhoto) {
-//         formData.append("passportPhoto", passportPhoto);
-//       }
-
-//       formData.append("education", JSON.stringify(education));
-
-//       formData.append(
-//         "experience",
-//         JSON.stringify(
-//           experience.map((exp) => ({
-//             ...exp,
-//             skillsUsed: exp.skillsUsed
-//               ? exp.skillsUsed.split(",").map((skill) => skill.trim())
-//               : [],
-//           }))
-//         )
-//       );
-
-//       Object.entries(documents).forEach(([fieldName, files]) => {
-//         Array.from(files).forEach((file) => {
-//           formData.append(fieldName, file);
-//         });
-//       });
-
-//       const res = await axios.post(`${EMPLOYEE_API_END_POINT}/register`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//         withCredentials: true,
-//       });
-
-//       setSuccess(res.data.message || "Employee registered successfully");
-//       setForm(initialForm);
-//       setEducation([
-//         {
-//           qualification: "",
-//           university: "",
-//           passingYear: "",
-//           percentage: "",
-//           specialization: "",
-//         },
-//       ]);
-//       setExperience([
-//         {
-//           companyName: "",
-//           designation: "",
-//           startDate: "",
-//           endDate: "",
-//           totalExperience: "",
-//           skillsUsed: "",
-//           reasonForLeaving: "",
-//         },
-//       ]);
-//       setProfilePhoto(null);
-//       setPassportPhoto(null);
-//       setDocuments({});
-//     } catch (err) {
-//       setError(err.response?.data?.message || "Failed to register employee");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 px-6 py-8">
-//       <div className="mx-auto max-w-7xl">
-//         <div className="mb-8">
-//           <h1 className="text-3xl font-bold text-gray-900">
-//             Register Employee
-//           </h1>
-//           <p className="mt-2 text-sm text-gray-500">
-//             Add employee personal, job, payroll, education, experience and
-//             document details.
-//           </p>
-//         </div>
-
-//         {success && (
-//           <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-//             {success}
-//           </div>
-//         )}
-
-//         {error && (
-//           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-//             {error}
-//           </div>
-//         )}
-
-//         <form onSubmit={handleSubmit} className="space-y-6">
-//           <Section title="Personal Information">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Employee ID *" name="employeeId" value={form.employeeId} onChange={handleChange} required />
-//               <Input label="First Name *" name="firstName" value={form.firstName} onChange={handleChange} required />
-//               <Input label="Middle Name" name="middleName" value={form.middleName} onChange={handleChange} />
-//               <Input label="Last Name *" name="lastName" value={form.lastName} onChange={handleChange} required />
-
-//               <Select label="Gender *" name="gender" value={form.gender} onChange={handleChange} required>
-//                 <option value="">Select gender</option>
-//                 <option value="Male">Male</option>
-//                 <option value="Female">Female</option>
-//                 <option value="Other">Other</option>
-//               </Select>
-
-//               <Input label="Date of Birth *" type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} required />
-//               <Input label="Marital Status" name="maritalStatus" value={form.maritalStatus} onChange={handleChange} />
-//               <Input label="Blood Group" name="bloodGroup" value={form.bloodGroup} onChange={handleChange} />
-//               <Input label="Nationality" name="nationality" value={form.nationality} onChange={handleChange} />
-
-//               <Input label="Profile Photo" type="file" accept="image/*" onChange={(e) => setProfilePhoto(e.target.files[0])} />
-//             </div>
-//           </Section>
-
-//           <Section title="Contact Information">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Personal Email *" type="email" name="personalEmail" value={form.personalEmail} onChange={handleChange} required />
-//               <Input label="Official Email *" type="email" name="officialEmail" value={form.officialEmail} onChange={handleChange} required />
-//               <Input label="Mobile Number *" name="mobileNumber" value={form.mobileNumber} onChange={handleChange} required />
-//               <Input label="Alternate Mobile Number" name="alternateMobileNumber" value={form.alternateMobileNumber} onChange={handleChange} />
-//               <Input label="Emergency Contact Name" name="emergencyContactName" value={form.emergencyContactName} onChange={handleChange} />
-//               <Input label="Emergency Contact Number" name="emergencyContactNumber" value={form.emergencyContactNumber} onChange={handleChange} />
-//               <Input label="City" name="city" value={form.city} onChange={handleChange} />
-//               <Input label="State" name="state" value={form.state} onChange={handleChange} />
-//               <Input label="Country" name="country" value={form.country} onChange={handleChange} />
-//               <Input label="Zip Code" name="zipCode" value={form.zipCode} onChange={handleChange} />
-
-//               <div className="md:col-span-3 grid grid-cols-1 gap-5 md:grid-cols-2">
-//                 <TextArea label="Current Address" name="currentAddress" value={form.currentAddress} onChange={handleChange} />
-//                 <TextArea label="Permanent Address" name="permanentAddress" value={form.permanentAddress} onChange={handleChange} />
-//               </div>
-//             </div>
-//           </Section>
-
-//           <Section title="Job Information">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Department *" name="department" value={form.department} onChange={handleChange} required />
-//               <Input label="Designation *" name="designation" value={form.designation} onChange={handleChange} required />
-
-//               <Select label="Employee Type *" name="employeeType" value={form.employeeType} onChange={handleChange} required>
-//                 <option value="">Select type</option>
-//                 <option value="Full-Time">Full-Time</option>
-//                 <option value="Part-Time">Part-Time</option>
-//                 <option value="Intern">Intern</option>
-//                 <option value="Contract">Contract</option>
-//               </Select>
-
-//               <Input label="Work Location" name="workLocation" value={form.workLocation} onChange={handleChange} />
-//               <Input label="Joining Date *" type="date" name="joiningDate" value={form.joiningDate} onChange={handleChange} required />
-//               <Input label="Probation End Date" type="date" name="probationEndDate" value={form.probationEndDate} onChange={handleChange} />
-//               <Input label="Shift Timing" name="shiftTiming" value={form.shiftTiming} onChange={handleChange} />
-
-//               <Select label="Work Mode" name="workMode" value={form.workMode} onChange={handleChange}>
-//                 <option value="">Select mode</option>
-//                 <option value="Onsite">Onsite</option>
-//                 <option value="Remote">Remote</option>
-//                 <option value="Hybrid">Hybrid</option>
-//               </Select>
-
-//               <Select label="Employment Status" name="employmentStatus" value={form.employmentStatus} onChange={handleChange}>
-//                 <option value="">Select status</option>
-//                 <option value="Active">Active</option>
-//                 <option value="On Notice">On Notice</option>
-//                 <option value="Inactive">Inactive</option>
-//               </Select>
-//             </div>
-//           </Section>
-
-//           <Section title="Payroll Information">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Salary" type="number" name="salary" value={form.salary} onChange={handleChange} />
-//               <Input label="Bank Name" name="bankName" value={form.bankName} onChange={handleChange} />
-//               <Input label="Account Number" name="accountNumber" value={form.accountNumber} onChange={handleChange} />
-//               <Input label="IFSC Code" name="ifscCode" value={form.ifscCode} onChange={handleChange} />
-//               <Input label="PAN Number" name="panNumber" value={form.panNumber} onChange={handleChange} />
-//             </div>
-//           </Section>
-
-//           <Section title="Education Details">
-//             <div className="space-y-5">
-//               {education.map((edu, index) => (
-//                 <div key={index} className="rounded-xl border bg-gray-50 p-4">
-//                   <div className="mb-4 flex items-center justify-between">
-//                     <h4 className="font-medium text-gray-800">
-//                       Education #{index + 1}
-//                     </h4>
-
-//                     {education.length > 1 && (
-//                       <button
-//                         type="button"
-//                         onClick={() =>
-//                           setEducation(education.filter((_, i) => i !== index))
-//                         }
-//                         className="text-sm font-medium text-red-600"
-//                       >
-//                         Remove
-//                       </button>
-//                     )}
-//                   </div>
-
-//                   <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//                     <Input label="Qualification" value={edu.qualification} onChange={(e) => updateEducation(index, "qualification", e.target.value)} />
-//                     <Input label="University" value={edu.university} onChange={(e) => updateEducation(index, "university", e.target.value)} />
-//                     <Input label="Passing Year" value={edu.passingYear} onChange={(e) => updateEducation(index, "passingYear", e.target.value)} />
-//                     <Input label="Percentage" value={edu.percentage} onChange={(e) => updateEducation(index, "percentage", e.target.value)} />
-//                     <Input label="Specialization" value={edu.specialization} onChange={(e) => updateEducation(index, "specialization", e.target.value)} />
-//                   </div>
-//                 </div>
-//               ))}
-
-//               <button
-//                 type="button"
-//                 onClick={() =>
-//                   setEducation([
-//                     ...education,
-//                     {
-//                       qualification: "",
-//                       university: "",
-//                       passingYear: "",
-//                       percentage: "",
-//                       specialization: "",
-//                     },
-//                   ])
-//                 }
-//                 className="rounded-xl border border-blue-200 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
-//               >
-//                 + Add Education
-//               </button>
-//             </div>
-//           </Section>
-
-//           <Section title="Experience Details">
-//             <div className="space-y-5">
-//               {experience.map((exp, index) => (
-//                 <div key={index} className="rounded-xl border bg-gray-50 p-4">
-//                   <div className="mb-4 flex items-center justify-between">
-//                     <h4 className="font-medium text-gray-800">
-//                       Experience #{index + 1}
-//                     </h4>
-
-//                     {experience.length > 1 && (
-//                       <button
-//                         type="button"
-//                         onClick={() =>
-//                           setExperience(experience.filter((_, i) => i !== index))
-//                         }
-//                         className="text-sm font-medium text-red-600"
-//                       >
-//                         Remove
-//                       </button>
-//                     )}
-//                   </div>
-
-//                   <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//                     <Input label="Company Name" value={exp.companyName} onChange={(e) => updateExperience(index, "companyName", e.target.value)} />
-//                     <Input label="Designation" value={exp.designation} onChange={(e) => updateExperience(index, "designation", e.target.value)} />
-//                     <Input label="Start Date" type="date" value={exp.startDate} onChange={(e) => updateExperience(index, "startDate", e.target.value)} />
-//                     <Input label="End Date" type="date" value={exp.endDate} onChange={(e) => updateExperience(index, "endDate", e.target.value)} />
-//                     <Input label="Total Experience" value={exp.totalExperience} onChange={(e) => updateExperience(index, "totalExperience", e.target.value)} />
-//                     <Input label="Skills Used" placeholder="React, Node, MongoDB" value={exp.skillsUsed} onChange={(e) => updateExperience(index, "skillsUsed", e.target.value)} />
-//                     <Input label="Reason For Leaving" value={exp.reasonForLeaving} onChange={(e) => updateExperience(index, "reasonForLeaving", e.target.value)} />
-//                   </div>
-//                 </div>
-//               ))}
-
-//               <button
-//                 type="button"
-//                 onClick={() =>
-//                   setExperience([
-//                     ...experience,
-//                     {
-//                       companyName: "",
-//                       designation: "",
-//                       startDate: "",
-//                       endDate: "",
-//                       totalExperience: "",
-//                       skillsUsed: "",
-//                       reasonForLeaving: "",
-//                     },
-//                   ])
-//                 }
-//                 className="rounded-xl border border-blue-200 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
-//               >
-//                 + Add Experience
-//               </button>
-//             </div>
-//           </Section>
-
-//           <Section title="Documents">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Passport Photo" type="file" accept="image/*" onChange={(e) => setPassportPhoto(e.target.files[0])} />
-//               <Input label="Aadhaar Card" type="file" name="aadhaarCard" onChange={handleDocumentChange} />
-//               <Input label="PAN Card" type="file" name="panCard" onChange={handleDocumentChange} />
-//               <Input label="Resume" type="file" name="resume" onChange={handleDocumentChange} />
-//               <Input label="Offer Letter" type="file" name="offerLetter" onChange={handleDocumentChange} />
-//               <Input label="Experience Letter" type="file" name="experienceLetter" multiple onChange={handleDocumentChange} />
-//               <Input label="Education Certificate" type="file" name="educationCertificate" multiple onChange={handleDocumentChange} />
-//             </div>
-//           </Section>
-
-//           <Section title="Login Credential">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-//               <Input label="Password *" type="password" name="password" value={form.password} onChange={handleChange} required />
-//             </div>
-//           </Section>
-
-//           <div className="sticky bottom-0 flex justify-end gap-3 border-t bg-white/90 px-6 py-4 backdrop-blur">
-//             <button
-//               type="button"
-//               className="rounded-xl border border-gray-300 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-//             >
-//               Cancel
-//             </button>
-
-//             <button
-//               type="submit"
-//               disabled={loading}
-//               className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-//             >
-//               {loading ? "Registering..." : "Register Employee"}
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-import React from 'react'
-
-const Employees = () => {
   return (
-    <div>Employees</div>
-  )
-}
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+        
+        <motion.div 
+          initial={{opacity:0, y:20, scale:0.95}} 
+          animate={{opacity:1, y:0, scale:1}} 
+          exit={{opacity:0, y:20, scale:0.95}} 
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col relative z-10 overflow-hidden"
+        >
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                {employee.firstName.charAt(0)}{employee.lastName.charAt(0)}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">{employee.firstName} {employee.lastName}</h2>
+                <p className="text-sm text-slate-500 font-medium">{employee.designation || "Employee"} • {employee.department}</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors">
+              <XCircle size={24}/>
+            </button>
+          </div>
 
-export default Employees
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 custom-scrollbar">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+                <p className="text-slate-500 font-medium">Analyzing Performance Metrics...</p>
+              </div>
+            ) : performance ? (
+              <div className="space-y-8">
+                
+                {/* Metrics Grid */}
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <TrendingUp size={20} className="text-indigo-500" /> Key Performance Indicators
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <MetricCard 
+                      title="Today Attempted" 
+                      value={performance.stats.todayAttempted} 
+                      icon={<PhoneCall size={24}/>} 
+                      bgClass="bg-blue-100" textClass="text-blue-600" 
+                    />
+                    <MetricCard 
+                      title="Daily Follow-ups" 
+                      value={performance.stats.todayFollowUps} 
+                      icon={<ListTodo size={24}/>} 
+                      bgClass="bg-amber-100" textClass="text-amber-600" 
+                    />
+                    <MetricCard 
+                      title="Missed Follow-ups" 
+                      value={performance.stats.missedFollowUps} 
+                      icon={<AlertCircle size={24}/>} 
+                      bgClass={performance.stats.missedFollowUps > 0 ? "bg-red-100" : "bg-slate-100"} 
+                      textClass={performance.stats.missedFollowUps > 0 ? "text-red-600" : "text-slate-500"} 
+                    />
+                    <MetricCard 
+                      title="Happy Clients" 
+                      value={performance.stats.pipeline.closedWon} 
+                      icon={<Trophy size={24}/>} 
+                      bgClass="bg-emerald-100" textClass="text-emerald-600" 
+                    />
+                  </div>
+                </div>
+
+                {/* Pipeline Stats */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-800 mb-6">Pipeline Breakdown</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                     <div>
+                       <p className="text-3xl font-black text-slate-700">{performance.stats.totalLeads}</p>
+                       <p className="text-sm font-medium text-slate-500 uppercase mt-1">Total Assigned</p>
+                     </div>
+                     <div>
+                       <p className="text-3xl font-black text-amber-600">{performance.stats.pipeline.interested}</p>
+                       <p className="text-sm font-medium text-slate-500 uppercase mt-1">Interested</p>
+                     </div>
+                     <div>
+                       <p className="text-3xl font-black text-rose-600">{performance.stats.pipeline.rejected}</p>
+                       <p className="text-sm font-medium text-slate-500 uppercase mt-1">Rejected</p>
+                     </div>
+                     <div>
+                       <p className="text-3xl font-black text-emerald-600">{performance.stats.pipeline.closedWon}</p>
+                       <p className="text-sm font-medium text-slate-500 uppercase mt-1">Closed Won</p>
+                     </div>
+                  </div>
+                </div>
+                
+                {/* Recent Leads */}
+                <div>
+                   <h3 className="text-lg font-bold text-slate-800 mb-4">Recent Leads</h3>
+                   {performance.recentLeads?.length > 0 ? (
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       {performance.recentLeads.map(lead => (
+                         <div key={lead._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                           <div className="flex justify-between items-start mb-2">
+                             <h4 className="font-bold text-slate-800">{lead.fullName}</h4>
+                             <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{lead.leadStatus}</span>
+                           </div>
+                           <p className="text-xs text-slate-500 font-medium">Source: {lead.leadSource}</p>
+                           <p className="text-xs text-slate-500 mt-2">Added: {new Date(lead.createdAt).toLocaleDateString('en-GB')}</p>
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
+                     <p className="text-slate-500 text-sm bg-white p-4 rounded-xl border border-slate-200 text-center">No recent leads assigned to this employee.</p>
+                   )}
+                </div>
+
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full text-red-500">Failed to load performance data.</div>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
+
+
+export default function Employees() {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await api.get("/employee/all");
+        if (res.data.success) {
+          setEmployees(res.data.data);
+        }
+      } catch (error) {
+        toast.error("Failed to load employees");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmployees();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-6 md:p-8 font-sans">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+              <Users className="text-indigo-600" size={32} />
+              Employee Directory
+            </h1>
+            <p className="text-slate-500 font-medium mt-2">Manage your team and track their performance.</p>
+          </div>
+          
+          <div className="bg-white px-6 py-3 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="bg-indigo-100 p-2.5 rounded-lg text-indigo-600">
+              <Building size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Employees</p>
+              {loading ? (
+                 <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
+              ) : (
+                 <p className="text-2xl font-black text-slate-800 leading-none mt-1">{employees.length}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Employee Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+          </div>
+        ) : employees.length === 0 ? (
+          <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center">
+             <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+             <h3 className="text-xl font-bold text-slate-700">No Employees Found</h3>
+             <p className="text-slate-500 mt-2">There are currently no employees registered in the system.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {employees.map((emp) => (
+              <div 
+                key={emp._id} 
+                onClick={() => setSelectedEmployee(emp)}
+                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all cursor-pointer group flex flex-col"
+              >
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xl font-bold shadow-inner group-hover:scale-105 transition-transform">
+                    {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors">
+                      {emp.firstName} {emp.lastName}
+                    </h3>
+                    <p className="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1">
+                      {emp.designation || "Employee"}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 mt-auto">
+                  <div className="flex items-center gap-3 text-sm text-slate-600">
+                    <Mail size={16} className="text-slate-400" />
+                    <span className="truncate">{emp.officialEmail}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-600">
+                    <Phone size={16} className="text-slate-400" />
+                    <span>{emp.mobileNumber}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${emp.employmentStatus === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                    {emp.employmentStatus || "Active"}
+                  </span>
+                  <span className="text-sm font-semibold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    View Performance &rarr;
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Performance Modal */}
+      {selectedEmployee && (
+        <EmployeePerformanceModal 
+          employee={selectedEmployee} 
+          onClose={() => setSelectedEmployee(null)} 
+        />
+      )}
+    </div>
+  );
+}
