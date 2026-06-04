@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { XCircle, Loader2, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
+import socket from "../../services/socket.js";
 import toast from "react-hot-toast";
 
 export default function MetricListModal({ listType, title, onClose, onLeadSelect }) {
@@ -25,6 +26,18 @@ export default function MetricListModal({ listType, title, onClose, onLeadSelect
     if (listType) {
       fetchList();
     }
+
+    // Listen for real-time updates and auto-refresh the list
+    const handleUpdate = () => {
+      if (listType) fetchList();
+    };
+    socket.on("lead:follow_ups_updated", handleUpdate);
+    socket.on("lead:stats_updated", handleUpdate);
+
+    return () => {
+      socket.off("lead:follow_ups_updated", handleUpdate);
+      socket.off("lead:stats_updated", handleUpdate);
+    };
   }, [listType]);
 
   const statusColors = {
