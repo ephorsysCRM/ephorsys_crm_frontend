@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Lock, Mail, Users, ShieldCheck } from "lucide-react";
 import { loginSuccess } from "../../redux/authSlice";
+import { joinUserRoom } from "../../services/authSocket";
 import api from "../../services/api";
 
 const Login = () => {
@@ -44,6 +45,9 @@ const Login = () => {
           user: response.data.data,
           role: roleMode
         }));
+        
+        // Connect socket and join user room for real-time updates
+        joinUserRoom(response.data.data._id);
         
         toast.success(`Welcome back, ${response.data.data.firstName || response.data.data.name}!`);
         navigate(roleMode === "admin" ? "/admin/dashboard" : "/bde/dashboard");
