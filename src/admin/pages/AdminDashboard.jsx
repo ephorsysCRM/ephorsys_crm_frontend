@@ -112,7 +112,7 @@ const blankExp = () => ({
 // ─────────────────────────────────────────────────────────────
 const VALIDATORS = {
   // employee.model.js
-  employeeId:             { required: true,  maxLen: 20, pattern: /^[A-Za-z0-9\-_]{2,20}$/, msg: "2–20 alphanumeric, hyphens or underscores" },
+  employeeId:             { required: true,  maxLen: 20, pattern: /^[A-Za-z0-9\ /-_]{2,20}$/, msg: "2–20 alphanumeric, hyphens or underscores" },
   firstName:              { required: true,  maxLen: 50, pattern: /^[A-Za-z\s]{2,50}$/,      msg: "2–50 letters only" },
   middleName:             { required: false, maxLen: 50, pattern: /^[A-Za-z\s]{0,50}$/,      msg: "Letters only" },
   lastName:               { required: true,  maxLen: 50, pattern: /^[A-Za-z\s]{2,50}$/,      msg: "2–50 letters only" },
@@ -170,7 +170,7 @@ const validateField = (name, value) => {
 // key filter helpers — block invalid keypresses at the DOM level
 const onlyDigits   = (e) => { if (!/[\d\b]/.test(e.key) && !["ArrowLeft","ArrowRight","Delete","Tab","Backspace"].includes(e.key)) e.preventDefault(); };
 const onlyLetters  = (e) => { if (!/[A-Za-z\s\b]/.test(e.key) && !["ArrowLeft","ArrowRight","Delete","Tab","Backspace"].includes(e.key)) e.preventDefault(); };
-const onlyAlphaNum = (e) => { if (!/[A-Za-z0-9\-_\b]/.test(e.key) && !["ArrowLeft","ArrowRight","Delete","Tab","Backspace"].includes(e.key)) e.preventDefault(); };
+const onlyAlphaNum = (e) => { if (!/[A-Za-z0-9\/-_\b]/.test(e.key) && !["ArrowLeft","ArrowRight","Delete","Tab","Backspace"].includes(e.key)) e.preventDefault(); };
 const onlyUpperAlphaNum = (e) => { if (!/[A-Za-z0-9\b]/.test(e.key) && !["ArrowLeft","ArrowRight","Delete","Tab","Backspace"].includes(e.key)) e.preventDefault(); };
 
 // ─────────────────────────────────────────────────────────────

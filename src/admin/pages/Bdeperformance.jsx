@@ -51,12 +51,16 @@ const EmployeePerformanceModal = ({ employee, onClose }) => {
           {/* Header */}
           <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
-                {employee.firstName.charAt(0)}{employee.lastName.charAt(0)}
+              <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold overflow-hidden">
+                {employee.profilePhoto ? (
+                  <img src={employee.profilePhoto} alt="profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span>{employee.firstName?.charAt(0)}{employee.lastName?.charAt(0)}</span>
+                )}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">{employee.firstName} {employee.lastName}</h2>
-                <p className="text-sm text-slate-500 font-medium">{employee.designation || "Employee"} • {employee.department}</p>
+                <h2 className="text-xl font-bold text-slate-900 uppercase">{employee.firstName} {employee.middleName} {employee.lastName}</h2>
+                <p className="text-sm text-slate-500 font-medium">{employee.jobInformation?.department || "Employee"} • {employee.jobInformation?.designation || "N/A"}</p>
               </div>
             </div>
             <button onClick={onClose} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors">
@@ -172,7 +176,9 @@ export default function Employees() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await api.get("/employee/all");
+        const res = await api.get("/employee/all", {
+          params: { department: "Business Development Executive" }
+        });
         if (res.data.success) {
           setEmployees(res.data.data);
         }
@@ -194,7 +200,7 @@ export default function Employees() {
           <div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
               <Users className="text-indigo-600" size={32} />
-              Employee Directory
+              BDE Directory
             </h1>
             <p className="text-slate-500 font-medium mt-2">Manage your team and track their performance.</p>
           </div>
@@ -204,7 +210,7 @@ export default function Employees() {
               <Building size={20} />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Employees</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Number of BDE</p>
               {loading ? (
                  <Loader2 className="w-5 h-5 animate-spin text-slate-400 mt-1" />
               ) : (
@@ -234,15 +240,19 @@ export default function Employees() {
                 className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all cursor-pointer group flex flex-col"
               >
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xl font-bold shadow-inner group-hover:scale-105 transition-transform">
-                    {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xl font-bold shadow-inner group-hover:scale-105 transition-transform overflow-hidden shrink-0">
+                    {emp.profilePhoto ? (
+                      <img src={emp.profilePhoto} alt="profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{emp.firstName?.charAt(0)}{emp.lastName?.charAt(0)}</span>
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors">
-                      {emp.firstName} {emp.lastName}
+                    <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors uppercase">
+                      {emp.firstName} {emp.middleName} {emp.lastName}
                     </h3>
                     <p className="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md inline-block mt-1">
-                      {emp.designation || "Employee"}
+                      {emp.jobInformation?.department || "Employee"}
                     </p>
                   </div>
                 </div>
@@ -259,8 +269,8 @@ export default function Employees() {
                 </div>
                 
                 <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${emp.employmentStatus === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                    {emp.employmentStatus || "Active"}
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${emp.jobInformation?.employmentStatus === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                    {emp.jobInformation?.employmentStatus || "Active"}
                   </span>
                   <span className="text-sm font-semibold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                     View Performance &rarr;
