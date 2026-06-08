@@ -7,12 +7,14 @@ import NotFound from "../pages/NotFound";
 import AdminLayout from "../layout/AdminLayout";
 import AdminDashboard from "../admin/pages/AdminDashboard";
 import AdminLead from "../admin/pages/Lead";
-import AdminEmployees from "../admin/pages/Employees";
+import AdminBdeperformance from "../admin/pages/Bdeperformance";
+import EmployeeDetails from "../admin/pages/EmployeeDetails";
 
 // BDE Layout & Pages
 import BdeLayout from "../layout/BdeLayout";
 import BdeDashboard from "../bde/pages/BdeDashboard";
 import BdeLead from "../bde/pages/Lead";
+
   
 const AppRoutes = () => {
   return (
@@ -27,7 +29,8 @@ const AppRoutes = () => {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="leads" element={<AdminLead />} />
-            <Route path="employees" element={<AdminEmployees />} />
+            <Route path="employees" element={<AdminBdeperformance />} />
+            <Route path="employeesdetails" element={<EmployeeDetails/>} />
           </Route>
         </Route>
 

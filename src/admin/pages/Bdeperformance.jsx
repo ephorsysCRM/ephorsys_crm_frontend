@@ -15,6 +15,7 @@ const MetricCard = ({ title, value, icon, bgClass, textClass }) => (
   </div>
 );
 
+
 const EmployeePerformanceModal = ({ employee, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [performance, setPerformance] = useState(null);

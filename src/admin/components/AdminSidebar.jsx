@@ -27,7 +27,12 @@ const NAV_ITEMS = [
   },
   {
     path: "/admin/employees",
-    label: "Employees",
+    label: "Bde performance ",
+    icon: BriefcaseBusiness,
+  },
+  {
+    path: "/admin/employeesdetails",
+    label: "Employees Details",
     icon: BriefcaseBusiness,
   },
   {

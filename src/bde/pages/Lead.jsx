@@ -29,7 +29,16 @@ export default function Lead() {
   const [leads, setLeads] = useState([]);
   const [pipeline, setPipeline] = useState({});
   const [hotlist, setHotlist] = useState([]);
+  const [activePipelineStage, setActivePipelineStage] = useState("Interested");
   const [stats, setStats] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  //pagination
+  const leadsPerPage = 8;
+  const totalPages = Math.ceil(leads.length / leadsPerPage);
+
+  const startIndex = (currentPage - 1) * leadsPerPage;
+  const currentLeads = leads.slice(startIndex, startIndex + leadsPerPage);
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -135,7 +144,7 @@ export default function Lead() {
 
   useEffect(() => {
     socket.on("lead:stats_updated", (data) => setStats(data));
-    
+
     // New listener for follow‑up list updates
     socket.on("lead:follow_ups_updated", (data) => {
       // Assuming the payload contains the refreshed hotlist array
@@ -148,7 +157,7 @@ export default function Lead() {
         fetchData();
       }
     });
-    
+
     return () => {
       socket.off("lead:stats_updated");
       socket.off("lead:follow_ups_updated");
@@ -349,7 +358,7 @@ export default function Lead() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 relative">
         {loading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-10">
             <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-2" />
@@ -360,123 +369,208 @@ export default function Lead() {
         ) : null}
 
         {/* Tab 1: All Leads Table */}
-        {activeTab === "all" && (
-          <div className="overflow-x-auto h-full">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                    Lead Name
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                    Mobile
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                    Project
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {leads.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan="5"
-                      className="px-6 py-12 text-center text-slate-500"
-                    >
-                      No leads found.
-                    </td>
-                  </tr>
-                ) : (
-                  leads.map((lead) => (
-                    <motion.tr
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      key={lead._id}
-                      className="hover:bg-slate-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 font-medium text-slate-900">
-                        {lead.fullName}
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {lead.mobileNumber}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2.5 py-1 text-xs font-medium rounded-full ${statusColors[lead.leadStatus] || "bg-slate-100 text-slate-600"}`}
-                        >
-                          {lead.leadStatus}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {formatProjectType(lead.projectType || "N/A")}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => setSelectedLeadId(lead._id)}
-                          className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                        >
-                          View & Update
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+       {activeTab === "all" && (
+  <div className="h-full flex flex-col">
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="bg-slate-50 border-b border-slate-200">
+          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+            Lead Name
+          </th>
+          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+            Mobile
+          </th>
+          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+            Status
+          </th>
+          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+            Project
+          </th>
+          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">
+            Actions
+          </th>
+        </tr>
+      </thead>
+
+      <tbody className="divide-y divide-slate-100">
+        {currentLeads.length === 0 ? (
+          <tr>
+            <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
+              No leads found.
+            </td>
+          </tr>
+        ) : (
+          currentLeads.map((lead) => (
+            <motion.tr
+              key={lead._id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="hover:bg-slate-50 transition-colors"
+            >
+              <td className="px-6 py-4 font-medium text-slate-900">
+                {lead.fullName}
+              </td>
+
+              <td className="px-6 py-4 text-slate-600">
+                {lead.mobileNumber}
+              </td>
+
+              <td className="px-6 py-4">
+                <span
+                  className={`px-2.5 py-1 text-xs font-medium rounded-full ${
+                    statusColors[lead.leadStatus] ||
+                    "bg-slate-100 text-slate-600"
+                  }`}
+                >
+                  {lead.leadStatus}
+                </span>
+              </td>
+
+              <td className="px-6 py-4 text-slate-600">
+                {formatProjectType(lead.projectType || "N/A")}
+              </td>
+
+              <td className="px-6 py-4 text-right">
+                <button
+                  onClick={() => setSelectedLeadId(lead._id)}
+                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                >
+                  View & Update
+                </button>
+              </td>
+            </motion.tr>
+          ))
         )}
+      </tbody>
+    </table>
+
+    {totalPages > 1 && (
+      <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white mt-auto">
+        <p className="text-sm text-slate-500">
+          Showing {startIndex + 1} to{" "}
+          {Math.min(startIndex + leadsPerPage, leads.length)} of{" "}
+          {leads.length} leads
+        </p>
+
+        <div className="flex items-center gap-2">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }).map((_, index) => {
+            const page = index + 1;
+
+            return (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-9 h-9 text-sm rounded-lg border ${
+                  currentPage === page
+                    ? "bg-indigo-600 text-white border-indigo-600"
+                    : "bg-white text-slate-600 border-slate-200"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
         {/* Tab 2: Pipeline Kanban (simplified layout) */}
         {activeTab === "pipeline" && (
-          <div className="flex gap-4 p-6 overflow-x-auto h-full items-start bg-slate-50/50">
-            {Object.keys(pipeline).map((stage) => {
-              const stageLeads = pipeline[stage];
-              if (stageLeads.length === 0) return null;
+          <div className="p-6 h-full bg-slate-50/50 overflow-y-auto">
+            {/* Pipeline Stage Buttons */}
+            <div className="flex gap-3 mb-6 overflow-x-auto">
+              {Object.keys(pipeline).map((stage) => {
+                const stageLeads = pipeline[stage];
 
-              return (
-                <div
-                  key={stage}
-                  className="min-w-[280px] flex-1 bg-slate-100/50 border border-slate-200 rounded-xl p-4"
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-slate-800">{stage}</h3>
-                    <span className="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                if (stageLeads.length === 0) return null;
+
+                return (
+                  <button
+                    key={stage}
+                    onClick={() => setActivePipelineStage(stage)}
+                    className={`shrink-0 px-5 py-3 rounded-xl text-sm font-semibold transition-all border ${
+                      activePipelineStage === stage
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {stage}
+                    <span
+                      className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                        activePipelineStage === stage
+                          ? "bg-white/20 text-white"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
                       {stageLeads.length}
                     </span>
-                  </div>
-                  <div className="space-y-3">
-                    {stageLeads.map((lead) => (
-                      <div
-                        key={lead._id}
-                        onClick={() => setSelectedLeadId(lead._id)}
-                        className="bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
-                      >
-                        <h4 className="font-medium text-slate-900 text-sm">
-                          {lead.fullName}
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {lead.mobileNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Stage Leads */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="font-semibold text-lg text-slate-800">
+                  {activePipelineStage}
+                </h3>
+
+                <span className="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
+                  {pipeline[activePipelineStage]?.length || 0} Leads
+                </span>
+              </div>
+
+              {pipeline[activePipelineStage]?.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {pipeline[activePipelineStage].map((lead) => (
+                    <div
+                      key={lead._id}
+                      onClick={() => setSelectedLeadId(lead._id)}
+                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <h4 className="font-semibold text-slate-900 text-sm">
+                        {lead.fullName}
+                      </h4>
+
+                      <p className="text-xs text-slate-500 mt-1">
+                        {lead.mobileNumber}
+                      </p>
+
+                      {lead.projectType && (
+                        <p className="text-xs text-indigo-600 mt-3 font-medium bg-indigo-50 inline-block px-2 py-1 rounded-md">
+                          {formatProjectType(lead.projectType)}
                         </p>
-                        {lead.projectType && (
-                          <p className="text-xs text-indigo-600 mt-2 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded-md">
-                            {formatProjectType(lead.projectType)}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
+              ) : (
+                <div className="text-center p-10 text-sm font-medium text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+                  No leads found in {activePipelineStage}
+                </div>
+              )}
+            </div>
           </div>
         )}
-
         {/* Tab 3: Hotlist */}
         {activeTab === "hotlist" && (
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
