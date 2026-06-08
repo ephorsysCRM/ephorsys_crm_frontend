@@ -10,13 +10,19 @@ import {
   Loader2,
   Eye,
   Filter,
+  IdCard,
+  IdCardLanyardIcon,
+  IdCardIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 const EmployeeDetails = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     department: "",
@@ -54,7 +60,7 @@ const EmployeeDetails = () => {
   }, [filters]);
 
   const filteredEmployees = employees.filter((emp) => {
-    const name = emp.fullName || emp.name || "";
+    const name = emp.firstName || emp.name || "";
     const email = emp.email || "";
     const phone = emp.phone || emp.mobileNumber || "";
 
@@ -92,7 +98,9 @@ const EmployeeDetails = () => {
             <Users size={20} />
           </div>
           <div>
-            <p className="text-xs text-slate-500 font-medium">Total Employees</p>
+            <p className="text-xs text-slate-500 font-medium">
+              Total Employees
+            </p>
             <h3 className="text-xl font-bold text-slate-900">
               {employees.length}
             </h3>
@@ -224,13 +232,25 @@ const EmployeeDetails = () => {
                 >
                   <div className="flex items-start justify-between mb-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                        {getInitials(employee.fullName || employee.name)}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-indigo-100 flex items-center justify-center">
+                        {employee.profilePhoto ? (
+                          <img
+                            src={employee.profilePhoto}
+                            alt="profile"
+                            className="w-full h-full object-center"
+                          />
+                        ) : (
+                          <span className="text-indigo-700 font-bold">
+                            {getInitials(employee.firstName || employee.firstName)}
+                          </span>
+                        )}
                       </div>
 
                       <div>
                         <h3 className="font-bold text-slate-900">
-                          {employee.fullName || employee.name || "No Name"}
+                          {`${employee.firstName} ${employee.middleName} ${employee.lastName}` ||
+                            employee.firstName ||
+                            "No Name"}
                         </h3>
                         <p className="text-xs text-slate-500">
                           {job.designation || "No Designation"}
@@ -251,8 +271,12 @@ const EmployeeDetails = () => {
 
                   <div className="space-y-3">
                     <p className="text-sm text-slate-600 flex items-center gap-2">
+                      <IdCard size={15} className="text-slate-400" />
+                      {employee.employeeId || "Id Not Found"}
+                    </p>
+                    <p className="text-sm text-slate-600 flex items-center gap-2">
                       <Mail size={15} className="text-slate-400" />
-                      {employee.email || "No email"}
+                      {employee.personalEmail || "No email"}
                     </p>
 
                     <p className="text-sm text-slate-600 flex items-center gap-2">
@@ -273,7 +297,7 @@ const EmployeeDetails = () => {
 
                     <p className="text-sm text-slate-600 flex items-center gap-2">
                       <MapPin size={15} className="text-slate-400" />
-                      {employee.address || "No address"}
+                      {employee.currentAddress || "No address"}
                     </p>
                   </div>
 
@@ -283,7 +307,7 @@ const EmployeeDetails = () => {
                       <h4 className="text-sm font-semibold text-slate-800 mt-1">
                         {job.joiningDate
                           ? new Date(job.joiningDate).toLocaleDateString(
-                              "en-IN"
+                              "en-IN",
                             )
                           : "N/A"}
                       </h4>
@@ -292,15 +316,16 @@ const EmployeeDetails = () => {
                     <div className="bg-slate-50 rounded-xl p-3">
                       <p className="text-xs text-slate-500">Salary</p>
                       <h4 className="text-sm font-semibold text-slate-800 mt-1">
-                        {payroll.basicSalary
-                          ? `₹${payroll.basicSalary}`
+                        {payroll?.salary
+                          ? `₹${payroll.salary}`
                           : "N/A"}
                       </h4>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => console.log("View employee", employee._id)}
+                    // onClick={() => console.log("View employee", employee._id)}
+                    onClick={() => navigate(`/admin/employeesdetails/${employee._id}`)}
                     className="w-full mt-5 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-semibold hover:bg-indigo-100 flex items-center justify-center gap-2"
                   >
                     <Eye size={16} />
