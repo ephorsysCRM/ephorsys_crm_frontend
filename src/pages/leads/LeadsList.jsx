@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Filter, Phone, Mail, MoreVertical } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Filter, Phone } from "lucide-react";
 import api from "../../services/api";
 import ActionModals from "../../components/ActionModals";
 
@@ -11,8 +11,7 @@ const LeadsList = () => {
   // Modal State
   const [modalState, setModalState] = useState({ isOpen: false, type: null, leadId: null });
 
-  const fetchLeads = async () => {
-    setIsLoading(true);
+  const fetchLeads = useCallback(async () => {
     try {
       const res = await api.get(`/lead/get-leads?list=${filter}`);
       setLeads(res.data.data.leads || []); // Ensure data structure matches API
@@ -21,11 +20,14 @@ const LeadsList = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLeads();
-  }, [filter]);
+  }, [fetchLeads]);
 
   const openModal = (type, leadId) => setModalState({ isOpen: true, type, leadId });
   const closeModal = () => setModalState({ isOpen: false, type: null, leadId: null });

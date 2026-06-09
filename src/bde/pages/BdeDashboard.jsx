@@ -5,8 +5,6 @@ import {
   CalendarCheck,
   AlertCircle,
   Briefcase,
-  ThumbsUp,
-  XCircle,
   Trophy,
   Loader2,
 } from "lucide-react";

@@ -15,11 +15,12 @@ import {
   IdCardIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllEmployees } from "../../redux/features/employeeSlice";
 
 const EmployeeDetails = () => {
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { employees, loading } = useSelector((state) => state.employee);
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
@@ -31,33 +32,21 @@ const EmployeeDetails = () => {
     workMode: "",
   });
 
-  const fetchEmployees = async () => {
-    setLoading(true);
+  const fetchEmployees = () => {
+    const params = {};
 
-    try {
-      const params = {};
+    if (filters.department) params.department = filters.department;
+    if (filters.employmentStatus)
+      params.employmentStatus = filters.employmentStatus;
+    if (filters.employeeType) params.employeeType = filters.employeeType;
+    if (filters.workMode) params.workMode = filters.workMode;
 
-      if (filters.department) params.department = filters.department;
-      if (filters.employmentStatus)
-        params.employmentStatus = filters.employmentStatus;
-      if (filters.employeeType) params.employeeType = filters.employeeType;
-      if (filters.workMode) params.workMode = filters.workMode;
-
-      const res = await api.get("/employee/all", { params });
-
-      if (res.data.success) {
-        setEmployees(res.data.data || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch employees:", error);
-    } finally {
-      setLoading(false);
-    }
+    dispatch(fetchAllEmployees(params));
   };
 
   useEffect(() => {
     fetchEmployees();
-  }, [filters]);
+  }, [filters, dispatch]);
 
   const filteredEmployees = employees.filter((emp) => {
     const name = emp.firstName || emp.name || "";

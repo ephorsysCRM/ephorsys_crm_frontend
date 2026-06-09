@@ -3,6 +3,18 @@ import { Search, Users, PhoneCall, AlertCircle, Target, UserCircle } from "lucid
 import api from "../../services/api";
 import toast from "react-hot-toast";
 
+const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass }) => (
+  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center space-x-4">
+    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColorClass}`}>
+      <Icon className={`w-6 h-6 ${colorClass}`} />
+    </div>
+    <div>
+      <p className="text-sm font-medium text-slate-500">{title}</p>
+      <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+    </div>
+  </div>
+);
+
 const AdminDashboard = () => {
   const [globalStats, setGlobalStats] = useState(null);
   const [employeeId, setEmployeeId] = useState("");
@@ -10,20 +22,21 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    fetchGlobalStats();
-  }, []);
-
   const fetchGlobalStats = async () => {
     try {
       const res = await api.get("/lead/dashboard");
       setGlobalStats(res.data.data);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch global stats");
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchGlobalStats();
+  }, []);
 
   const handleSearchEmployee = async (e) => {
     e.preventDefault();
@@ -46,17 +59,7 @@ const AdminDashboard = () => {
     return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>;
   }
 
-  const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass }) => (
-    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center space-x-4">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColorClass}`}>
-        <Icon className={`w-6 h-6 ${colorClass}`} />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-slate-500">{title}</p>
-        <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-      </div>
-    </div>
-  );
+
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

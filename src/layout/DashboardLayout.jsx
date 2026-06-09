@@ -5,7 +5,6 @@ import {
   Users, 
   LogOut, 
   Menu, 
-  X, 
   Flame, 
   Kanban,
   PlusCircle

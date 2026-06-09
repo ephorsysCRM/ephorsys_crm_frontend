@@ -6,7 +6,7 @@ import {
   logoutSuccess,
 } from "./authSlice";
 import toast from "react-hot-toast";
-import socket from "../../socket/socket.js"; 
+import socket from "../../../socket/socket.js"; 
 
 // ---------------------------------------------
 // Login Admin

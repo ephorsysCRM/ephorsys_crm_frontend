@@ -13,14 +13,14 @@ import {
   X,
   Loader2,
   Phone,
-  Mail,
   MapPin,
-  Calendar,
   Building2,
   BadgeCheck,
   AlertCircle,
 } from "lucide-react";
 import api from "../../services/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEmployeeById, updateEmployee, clearCurrentEmployee } from "../../redux/features/employeeSlice";
 
 // ─── Reusable editable field ────────────────────────────────────────────────
 const EditableField = ({ label, value, name, type = "text", options, onSave }) => {
@@ -113,25 +113,21 @@ const Section = ({ icon: Icon, title, children }) => (
 const EmployeeDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [employee, setEmployee] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  
+  const { currentEmployee: employee, loading } = useSelector((state) => state.employee);
   const [toast, setToast] = useState(null);
 
-  const fetchEmployee = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get(`/employee/${id}`);
-      if (res.data.success) setEmployee(res.data.data);
-    } catch (err) {
-      console.error("Failed to fetch employee:", err);
-    } finally {
-      setLoading(false);
-    }
+  const fetchEmployee = () => {
+    dispatch(fetchEmployeeById(id));
   };
 
   useEffect(() => {
     fetchEmployee();
-  }, [id]);
+    return () => {
+      dispatch(clearCurrentEmployee());
+    };
+  }, [id, dispatch]);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -141,18 +137,9 @@ const EmployeeDetailPage = () => {
   // Generic save handler — customize endpoints as needed
   const handleSave = async (section, field, value) => {
     try {
-      await api.patch(`/employee/${id}`, { [section]: { [field]: value } });
-      setEmployee((prev) => {
-        if (section === "root") {
-          return { ...prev, [field]: value };
-        } else if (section === "educationDetails" || section === "experienceDetails") {
-          const currentArr = prev[section] && prev[section].length > 0 ? prev[section] : [{}];
-          const updatedItem = { ...currentArr[0], [field]: value };
-          return { ...prev, [section]: [updatedItem, ...currentArr.slice(1)] };
-        } else {
-          return { ...prev, [section]: { ...prev[section], [field]: value } };
-        }
-      });
+      await dispatch(updateEmployee({ id, data: { [section]: { [field]: value } } })).unwrap();
+      // Re-fetch to sync Redux state with backend
+      await dispatch(fetchEmployeeById(id)).unwrap();
       showToast("Field updated successfully");
     } catch (err) {
       showToast("Failed to update field", "error");

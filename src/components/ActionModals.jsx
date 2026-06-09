@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { X, Calendar } from "lucide-react";
+import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../services/api";
 
@@ -11,7 +11,7 @@ const ActionModals = ({
   leadId, 
   onSuccess 
 }) => {
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, watch } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const callStatus = watch("callStatus");
