@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { 
-  XCircle, Loader2, Phone, Calendar, User, 
-  Clock, History, CheckCircle2, MessageSquare, PhoneCall, Handshake
+  XCircle, Loader2, Phone, Calendar, 
+  History, CheckCircle2, MessageSquare, PhoneCall, Handshake
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -57,7 +57,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
         setLead(res.data.data);
         setCallData(prev => ({ ...prev, projectType: res.data.data.projectType || "" }));
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to load lead details.");
       onClose();
     } finally {
@@ -66,6 +66,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     if (leadId) fetchLead();
   }, [leadId]);
 

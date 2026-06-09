@@ -6,10 +6,6 @@ const HotlistView = () => {
   const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchHotlist();
-  }, []);
-
   const fetchHotlist = async () => {
     try {
       const res = await api.get("/lead/hotlist");
@@ -20,6 +16,11 @@ const HotlistView = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchHotlist();
+  }, []);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin"></div></div>;

@@ -17,8 +17,8 @@ export default function MetricListModal({ listType, title, onClose, onLeadSelect
         if (res.data.success) {
           setLeads(res.data.data);
         }
-      } catch (err) {
-        toast.error("Failed to load list details.");
+      } catch (error) {
+        toast.error("Failed to fetch leads");
       } finally {
         setLoading(false);
       }

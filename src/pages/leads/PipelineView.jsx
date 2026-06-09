@@ -10,10 +10,6 @@ const PipelineView = () => {
   const [pipelineData, setPipelineData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPipeline();
-  }, []);
-
   const fetchPipeline = async () => {
     try {
       const res = await api.get("/lead/pipeline");
@@ -24,6 +20,11 @@ const PipelineView = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchPipeline();
+  }, []);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>;

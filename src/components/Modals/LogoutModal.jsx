@@ -2,10 +2,10 @@ import { LogOut, X } from "lucide-react";
 
 import { motion } from "framer-motion";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../redux/authSlice";
+import { logOutAdmin } from "../../redux/features/auth/authThunk";
 
 const LogoutModal = ({ onClose }) => {
   // ==================================================
@@ -19,15 +19,14 @@ const LogoutModal = ({ onClose }) => {
   // Redux State
   // ==================================================
 
-  // (Optional: remove loading if not needed, or fallback to false if undefined)
-  const loading = false; 
+  const loading = false;
 
   // ==================================================
   // Handle Logout
   // ==================================================
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(logOutAdmin());
     navigate("/");
   };
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { store } from "../redux/store";
-import { logout } from "../redux/authSlice";
+import { logoutSuccess } from "../redux/features/auth/authSlice";
 
 // Create an Axios instance
 const api = axios.create({
@@ -19,7 +19,7 @@ api.interceptors.response.use(
   (error) => {
     // If the server sends a 401 Unauthorized, automatically log the user out on the frontend
     if (error.response && error.response.status === 401) {
-      store.dispatch(logout());
+      store.dispatch(logoutSuccess());
       // Optional: redirect to login here, but usually React Router handles it based on auth state
     }
     return Promise.reject(error);

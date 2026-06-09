@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, PhoneCall, User, Briefcase, MessageSquare } from "lucide-react";
+import { PlusCircle, PhoneCall, User, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
 

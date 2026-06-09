@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import axios from "axios";
-import { EMPLOYEE_API_END_POINT } from "../../utils/endpoints";
+import { useDispatch } from "react-redux";
+import { registerEmployee } from "../../redux/features/employeeSlice";
 
 // ─────────────────────────────────────────────────────────────
 // STEPS
@@ -306,6 +306,7 @@ const FileUploadBtn = ({ label, fileName, hasFile, inputProps }) => (
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 export default function RegisterEmployee() {
+  const dispatch = useDispatch();
   const [form, setForm]             = useState(initialForm);
   const [errors, setErrors]         = useState({});
   const [touched, setTouched]       = useState({});
@@ -415,7 +416,6 @@ export default function RegisterEmployee() {
     setLoading(true);
     try {
       // Never send an empty string for any enum field — Mongoose rejects it.
-      // Since all enums are now required, this is a safety net only.
       const ENUM_FIELDS = new Set([
         "gender", "maritalStatus", "bloodGroup",
         "employeeType", "workMode", "employmentStatus",
@@ -423,7 +423,7 @@ export default function RegisterEmployee() {
 
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {
-        if (ENUM_FIELDS.has(k) && !v) return; // skip empty enum → backend uses model default
+        if (ENUM_FIELDS.has(k) && !v) return;
         fd.append(k, v);
       });
       if (profilePhoto)  fd.append("profilePhoto",  profilePhoto);
@@ -440,18 +440,17 @@ export default function RegisterEmployee() {
       Object.entries(documents).forEach(([field, files]) => {
         Array.from(files).forEach(file => fd.append(field, file));
       });
-      const res = await axios.post(`${EMPLOYEE_API_END_POINT}/register`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
-      showToast("success", res.data.message || "Employee registered successfully!");
+
+      // Dispatch via Redux thunk — this also adds the new employee to state.employee.employees
+      const result = await dispatch(registerEmployee(fd)).unwrap();
+      showToast("success", result?.message || "Employee registered successfully!");
       setForm(initialForm);
       setEducation([blankEdu()]); setExperience([blankExp()]);
       setProfilePhoto(null); setPassportPhoto(null);
       setDocuments({}); setErrors({}); setTouched({});
       setStep(0);
     } catch (err) {
-      const msg = err.response?.data?.message || "Registration failed. Please try again.";
+      const msg = err?.message || "Registration failed. Please try again.";
       showToast("error", msg);
       const lmsg = msg.toLowerCase();
       if (lmsg.includes("employee id")) {

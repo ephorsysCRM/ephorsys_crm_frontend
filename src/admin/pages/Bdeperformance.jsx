@@ -3,6 +3,8 @@ import { Users, Loader2, User, Phone, Mail, Building, XCircle, TrendingUp, Phone
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllEmployees } from "../../redux/features/employeeSlice";
 
 // Helper component for the Metric Cards in the Performance Modal
 const MetricCard = ({ title, value, icon, bgClass, textClass }) => (
@@ -169,27 +171,13 @@ const EmployeePerformanceModal = ({ employee, onClose }) => {
 
 
 export default function Employees() {
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { employees, loading } = useSelector((state) => state.employee);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await api.get("/employee/all", {
-          params: { department: "Business Development Executive" }
-        });
-        if (res.data.success) {
-          setEmployees(res.data.data);
-        }
-      } catch (error) {
-        toast.error("Failed to load employees");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmployees();
-  }, []);
+    dispatch(fetchAllEmployees({ department: "Business Development Executive" }));
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 md:p-8 font-sans">

@@ -7,10 +7,7 @@ import {
   Loader2,
   Phone,
   Calendar,
-  CheckCircle2,
   XCircle,
-  ChevronRight,
-  MessageSquare,
   PhoneCall,
   AlertCircle,
   Trophy,
@@ -131,7 +128,7 @@ export default function Lead() {
         const res = await api.get("/lead/hotlist");
         setHotlist(res.data.data);
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to load leads data");
     } finally {
       setLoading(false);
@@ -139,6 +136,7 @@ export default function Lead() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, [activeTab]);
 
