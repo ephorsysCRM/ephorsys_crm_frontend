@@ -60,13 +60,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-gradient-to-br from-zinc-900 to-black border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
         
         {/* Header */}
         <div className="p-8 text-center pb-6">
-          <div className="mx-auto w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4">
-            <ShieldCheck className="w-8 h-8 text-indigo-400" />
+          <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+            <ShieldCheck className="w-8 h-8 text-green-400" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">CRM Portal Login</h2>
           <p className="text-slate-400 text-sm">Sign in to manage your leads and pipeline</p>
@@ -79,8 +79,8 @@ const Login = () => {
             onClick={() => setRoleMode("employee")}
             className={`flex-1 py-2.5 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all ${
               roleMode === "employee" 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30" 
-                : "bg-slate-800 text-slate-400 hover:bg-slate-750"
+                ? "bg-green-600 text-white shadow-lg shadow-green-500/30" 
+                : "bg-slate-800/50 text-white hover:bg-green-900"
             }`}
           >
             <Users className="w-4 h-4" />
@@ -91,8 +91,8 @@ const Login = () => {
             onClick={() => setRoleMode("admin")}
             className={`flex-1 py-2.5 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all ${
               roleMode === "admin" 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30" 
-                : "bg-slate-800 text-slate-400 hover:bg-slate-750"
+                ? "bg-green-600 text-white shadow-lg shadow-green-500/30" 
+                : "bg-slate-800/50 text-white hover:bg-green-900"
             }`}
           >
             <Lock className="w-4 h-4" />
@@ -113,7 +113,7 @@ const Login = () => {
               <input
                 type="email"
                 {...register("email", { required: "Email is required" })}
-                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green  -500 focus:border-transparent transition-all"
                 placeholder={roleMode === "admin" ? "admin@company.com" : "employee@company.com"}
               />
             </div>
@@ -129,7 +129,7 @@ const Login = () => {
               <input
                 type="password"
                 {...register("password", { required: "Password is required" })}
-                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -139,7 +139,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-6 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 focus:ring-offset-slate-900 transition-all disabled:opacity-50 flex justify-center items-center"
+            className="w-full mt-6 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-green-600 hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 focus:ring-offset-slate-900 transition-all disabled:opacity-50 flex justify-center items-center"
           >
             {isLoading ? (
                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
