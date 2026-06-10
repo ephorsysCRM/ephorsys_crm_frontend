@@ -6,12 +6,12 @@ import {
   BriefcaseBusiness,
   BarChart3,
 } from "lucide-react";
-
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Modal from "../../components/ui/Modal";
 import LogoutModal from "../../components/Modals/LogoutModal";
+import logo from "../../assets/logo.png";
 
 const NAV_ITEMS = [
   {
@@ -64,15 +64,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           transition={{ duration: 0.4 }}
           className="flex items-center justify-between px-5 h-16 border-b border-white/10"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center overflow-hidden shadow-lg">
+          <div className="flex items-center">
+            <div className="w-20 h-20 flex items-center justify-center">
               <img
-                src="/mylogo.png"
-                alt="Logo"
-                className="w-8 h-8 object-contain"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                src={logo}
+                alt="logo"
+                className="w-full h-full object-contain"
               />
             </div>
 
@@ -132,7 +129,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Bottom */}
         <div className="p-4 border-t border-white/10 bg-black/20 backdrop-blur-md">
-
           {/* Logout */}
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -159,9 +155,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           title="Logout"
           size="sm"
         >
-          <LogoutModal
-            onClose={() => setLogoutOpen(false)}
-          />
+          <LogoutModal onClose={() => setLogoutOpen(false)} />
         </Modal>
       </aside>
     </>
