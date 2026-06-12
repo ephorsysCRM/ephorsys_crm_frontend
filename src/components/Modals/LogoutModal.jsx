@@ -72,6 +72,7 @@ const LogoutModal = ({ onClose }) => {
           Cancel
         </motion.button>
 
+{/*  */}
         {/* Logout */}
         <motion.button
           whileHover={{ scale: 1.02 }}
