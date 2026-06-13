@@ -1,1 +1,1 @@
-export const  EMPLOYEE_API_END_POINT="http://localhost:8800/api/v1/employee" //Employee api end point
+export const  EMPLOYEE_API_END_POINT="https://ephorsys-crm-backend.onrender.com/api/v1/employee" //Employee api end point

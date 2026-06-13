@@ -4,7 +4,7 @@ import { logoutSuccess } from "../redux/features/auth/authSlice";
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: "http://localhost:8800/api/v1", // Using standard port from the backend
+  baseURL: "https://ephorsys-crm-backend.onrender.com/api/v1", // Using standard port from the backend
   withCredentials: true, // Important for sending/receiving HTTP-only cookies
   headers: {
     "Content-Type": "application/json",
