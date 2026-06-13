@@ -2,11 +2,10 @@ import { LogOut, X } from "lucide-react";
 
 import { motion } from "framer-motion";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
 import { logOutAdmin } from "../../redux/features/auth/authThunk";
-
 
 const LogoutModal = ({ onClose }) => {
   // ==================================================
@@ -14,16 +13,13 @@ const LogoutModal = ({ onClose }) => {
   // ==================================================
 
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   // ==================================================
   // Redux State
   // ==================================================
 
-  const { loading } = useSelector(
-    (state) => state.auth
-  );
+  const loading = false;
 
   // ==================================================
   // Handle Logout
@@ -31,7 +27,6 @@ const LogoutModal = ({ onClose }) => {
 
   const handleLogout = async () => {
     await dispatch(logOutAdmin());
-
     navigate("/");
   };
 
@@ -77,6 +72,7 @@ const LogoutModal = ({ onClose }) => {
           Cancel
         </motion.button>
 
+{/*  */}
         {/* Logout */}
         <motion.button
           whileHover={{ scale: 1.02 }}

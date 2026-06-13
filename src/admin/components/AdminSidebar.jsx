@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Modal from "../../components/ui/Modal";
 import LogoutModal from "../../components/Modals/LogoutModal";
 import { useState } from "react";
+import logo from "../../assets/logo.png";
 
 const NAV_ITEMS = [
   {
@@ -27,7 +28,12 @@ const NAV_ITEMS = [
   },
   {
     path: "/admin/employees",
-    label: "Employees",
+    label: "Bde performance ",
+    icon: BriefcaseBusiness,
+  },
+  {
+    path: "/admin/employeesdetails",
+    label: "Employees Details",
     icon: BriefcaseBusiness,
   },
   {
@@ -81,15 +87,12 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
           className="h-16 px-5 border-b border-white/10 flex items-center justify-between"
         >
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center shadow-lg overflow-hidden">
+          <div className="flex items-center ">
+            <div className="w-20 h-20 flex items-center justify-center">
               <img
-                src="/mylogo.png"
+                src={logo}
                 alt="logo"
-                className="w-8 h-8 object-contain"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                className="w-full h-full object-contain"
               />
             </div>
 
@@ -132,9 +135,10 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   group flex items-center gap-3 px-4 py-3 rounded-2xl
                   text-sm font-medium transition-all duration-300
 
-                  ${isActive
-                    ? "bg-white text-[var(--primary-700)] shadow-lg"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                  ${
+                    isActive
+                      ? "bg-white text-[var(--primary-700)] shadow-lg"
+                      : "text-slate-300 hover:bg-white/10 hover:text-white"
                   }
                 `
                 }
@@ -175,9 +179,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
           title="Logout"
           size="sm"
         >
-          <LogoutModal
-            onClose={() => setLogoutOpen(false)}
-          />
+          <LogoutModal onClose={() => setLogoutOpen(false)} />
         </Modal>
       </aside>
     </>

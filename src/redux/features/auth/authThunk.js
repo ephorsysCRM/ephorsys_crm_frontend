@@ -6,6 +6,7 @@ import {
   logoutSuccess,
 } from "./authSlice";
 import toast from "react-hot-toast";
+import socket from "../../../socket/socket.js"; 
 
 // ---------------------------------------------
 // Login Admin
@@ -16,6 +17,10 @@ export const loginAdmin = (formData) => async (dispatch) => {
     const { data } = await api.post("/admin/login", formData);
     toast.success(data.message || "Login successful");
     dispatch(loginSuccess(data.data));
+
+    // Connect socket and join room after login
+    socket.connect();
+    socket.emit("join", { userId: data.data._id });
   } catch (error) {
     const msg = error.response?.data?.message || "Something went wrong";
     toast.error(msg);
@@ -31,6 +36,7 @@ export const logOutAdmin = () => async (dispatch) => {
     const { data } = await api.post("/admin/logout");
     toast.success(data.message || "Logged out successfully");
     dispatch(logoutSuccess());
+    socket.disconnect();
   } catch (error) {
     const msg = error.response?.data?.message || "Logout failed";
     toast.error(msg);

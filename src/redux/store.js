@@ -1,48 +1,38 @@
 import { configureStore } from "@reduxjs/toolkit";
-
-import { persistReducer, persistStore } from "redux-persist";
-
-import createWebStorage from "redux-persist/es/storage/createWebStorage";
-
+import { persistStore, persistReducer } from "redux-persist";
 import rootReducer from "./rootReducer";
 
-// =============================================
-// Create Storage
-// =============================================
-
-const storage = createWebStorage("local");
-
-// =============================================
-// Persist Config
-// =============================================
-
-const persistConfig = {
-  key: "root",
-  storage,
-  whitelist: ["auth"],
+const storage = {
+  getItem: (key) => {
+    return Promise.resolve(localStorage.getItem(key));
+  },
+  setItem: (key, value) => {
+    localStorage.setItem(key, value);
+    return Promise.resolve(value);
+  },
+  removeItem: (key) => {
+    localStorage.removeItem(key);
+    return Promise.resolve();
+  },
 };
 
-// =============================================
-// Persist Reducer
-// =============================================
+// Redux Persist config
+const persistConfig = {
+  key: "crm-root",
+  storage,
+  whitelist: ["auth"], // Only persist the auth slice
+};
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// =============================================
-// Store
-// =============================================
-
 export const store = configureStore({
   reducer: persistedReducer,
-
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"], // Ignore persistence actions for serializability
+      },
     }),
 });
-
-// =============================================
-// Persistor
-// =============================================
 
 export const persistor = persistStore(store);
