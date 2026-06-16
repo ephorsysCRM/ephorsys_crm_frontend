@@ -10,6 +10,7 @@ import AdminLead from "../admin/pages/Lead";
 import AdminBdeperformance from "../admin/pages/Bdeperformance";
 import EmployeeDetails from "../admin/pages/EmployeeDetails";
 import EmployeeDetailPage from "../admin/pages/EmployeeDetailPage";
+import AdminRegister from "../admin/pages/AdminRegister";
 
 
 // BDE Layout & Pages
@@ -30,6 +31,7 @@ const AppRoutes = () => {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="register" element={<AdminRegister />} />
             <Route path="leads" element={<AdminLead />} />
             <Route path="employees" element={<AdminBdeperformance />} />
             <Route path="employeesdetails" element={<EmployeeDetails/>} />
