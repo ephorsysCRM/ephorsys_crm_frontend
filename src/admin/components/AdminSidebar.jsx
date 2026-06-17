@@ -6,6 +6,7 @@ import {
   Settings,
   BriefcaseBusiness,
   BarChart3,
+  UserPlus
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -20,6 +21,11 @@ const NAV_ITEMS = [
     path: "/admin/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    path: "/admin/register",
+    label: "Employee Register",
+    icon: UserPlus,
   },
   {
     path: "/admin/leads",
