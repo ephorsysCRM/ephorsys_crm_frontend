@@ -17,8 +17,9 @@ import AdminRegister from "../admin/pages/AdminRegister";
 import BdeLayout from "../layout/BdeLayout";
 import BdeDashboard from "../bde/pages/BdeDashboard";
 import BdeLead from "../bde/pages/Lead";
+import AllEmployeeList from "../admin/pages/AllEmployeeList";
 
-  
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -32,10 +33,12 @@ const AppRoutes = () => {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="register" element={<AdminRegister />} />
+            <Route path="allemloyees" element={<AllEmployeeList />} />
+
             <Route path="leads" element={<AdminLead />} />
             <Route path="employees" element={<AdminBdeperformance />} />
-            <Route path="employeesdetails" element={<EmployeeDetails/>} />
-            <Route path="employeesdetails/:id" element={<EmployeeDetailPage/>} />
+            <Route path="employeesdetails" element={<EmployeeDetails />} />
+            <Route path="employeesdetails/:id" element={<EmployeeDetailPage />} />
           </Route>
         </Route>
 
