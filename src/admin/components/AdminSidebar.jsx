@@ -23,8 +23,8 @@ const NAV_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    path: "/admin/register",
-    label: "Employee Register",
+    path: "/admin/allemloyees",
+    label: "Employees",
     icon: UserPlus,
   },
   {
@@ -78,7 +78,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 w-65
-          bg-gradient-to-b from-[var(--primary-700)] via-[var(--primary-800)] to-black
+          bg-linear-to-b from-(--primary-700) via-(--primary-800) to-black
           text-white flex flex-col border-r border-white/10 shadow-2xl
           transition-transform duration-300
           lg:relative lg:translate-x-0
@@ -141,10 +141,9 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   group flex items-center gap-3 px-4 py-3 rounded-2xl
                   text-sm font-medium transition-all duration-300
 
-                  ${
-                    isActive
-                      ? "bg-white text-[var(--primary-700)] shadow-lg"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                  ${isActive
+                    ? "bg-white text-(--primary-700) shadow-lg"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
                   }
                 `
                 }
@@ -168,8 +167,8 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
             whileTap={{ scale: 0.98 }}
             className="
               w-full flex items-center justify-center gap-3 py-2 rounded-2xl
-              bg-[var(--primary)] hover:bg-[var(--primary-500)]
-              transition font-medium shadow-lg shadow-[var(--primary)]/30
+              bg-(--primary) hover:bg-(--primary-500)
+              transition font-medium shadow-lg shadow-(--primary)/30
             "
             onClick={() => setLogoutOpen(true)}
           >
