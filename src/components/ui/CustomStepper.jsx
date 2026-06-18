@@ -3,56 +3,61 @@ import { cls } from "../../utils/helpers";
 
 export default function CustomStepper({ steps, activeStep, onStepClick }) {
   return (
-    <div className="flex items-center justify-between w-full">
-      {steps.map((label, index) => {
-        const isActive = index === activeStep;
-        const isCompleted = index < activeStep;
+    <div className="w-full overflow-x-auto">
+      <div className="flex items-center min-w-max px-1 mt-1 pb-9">
+        {steps.map((label, index) => {
+          const isActive = index === activeStep;
+          const isCompleted = index < activeStep;
+          const isDisabled = index > activeStep + 1;
 
-        return (
-          <div key={index} className="flex items-center flex-1">
-            <button
-              type="button"
-              onClick={() => onStepClick?.(index)}
-              className="flex flex-col items-center group"
-              disabled={index > activeStep + 1}
-            >
-              <div
+          return (
+            <div key={index} className="flex items-center ">
+              <button
+                type="button"
+                disabled={isDisabled}
+                onClick={() => onStepClick?.(index)}
                 className={cls(
-                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all",
+                  "flex items-center gap-2 rounded-full px-3 py-1.5 transition-all",
                   isActive
-                    ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                    ? "bg-green-600 text-white shadow-md"
                     : isCompleted
-                      ? "bg-emerald-500 text-white"
-                      : "bg-slate-200 text-slate-500 border-2 border-slate-300"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-slate-100 text-slate-500",
+                  isDisabled
+                    ? "cursor-not-allowed opacity-60"
+                    : "hover:bg-indigo-50 hover:text-black"
                 )}
               >
-                {isCompleted ? "✓" : index + 1}
-              </div>
-              <span
-                className={cls(
-                  "text-[10px] font-medium mt-1.5 whitespace-nowrap",
-                  isActive
-                    ? "text-indigo-600"
-                    : isCompleted
-                      ? "text-emerald-600"
-                      : "text-slate-400"
-                )}
-              >
-                {label}
-              </span>
-            </button>
+                <span
+                  className={cls(
+                    "flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold",
+                    isActive
+                      ? "bg-white text-green-600"
+                      : isCompleted
+                      ? "bg-green-500 text-white"
+                      : "bg-white text-slate-500"
+                  )}
+                >
+                  {isCompleted ? "✓" : index + 1}
+                </span>
 
-            {index < steps.length - 1 && (
-              <div
-                className={cls(
-                  "h-0.5 flex-1 mx-2 transition-all",
-                  index < activeStep ? "bg-emerald-500" : "bg-slate-200"
-                )}
-              />
-            )}
-          </div>
-        );
-      })}
+                <span className="hidden md:block text-xs font-medium whitespace-nowrap">
+                  {label}
+                </span>
+              </button>
+
+              {index < steps.length - 1 && (
+                <div
+                  className={cls(
+                    "mx-2 h-[2px] w-8 rounded-full",
+                    index < activeStep ? "bg-green-500" : "bg-slate-200"
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

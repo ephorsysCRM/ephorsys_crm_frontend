@@ -37,11 +37,11 @@ const NAV_ITEMS = [
     label: "Bde performance ",
     icon: BriefcaseBusiness,
   },
-  {
-    path: "/admin/employeesdetails",
-    label: "Employees Details",
-    icon: BriefcaseBusiness,
-  },
+  // {
+  //   path: "/admin/employeesdetails",
+  //   label: "Employees Details",
+  //   icon: BriefcaseBusiness,
+  // },
   {
     path: "/admin/analytics",
     label: "Analytics",
