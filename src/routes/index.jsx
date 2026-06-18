@@ -8,7 +8,7 @@ import AdminLayout from "../layout/AdminLayout";
 import AdminDashboard from "../admin/pages/AdminDashboard";
 import AdminLead from "../admin/pages/Lead";
 import AdminBdeperformance from "../admin/pages/Bdeperformance";
-import EmployeeDetails from "../admin/pages/EmployeeDetails";
+// import EmployeeDetails from "../admin/pages/EmployeeDetails";
 import EmployeeDetailPage from "../admin/pages/EmployeeDetailPage";
 import AdminRegister from "../admin/pages/AdminRegister";
 
@@ -37,7 +37,7 @@ const AppRoutes = () => {
 
             <Route path="leads" element={<AdminLead />} />
             <Route path="employees" element={<AdminBdeperformance />} />
-            <Route path="employeesdetails" element={<EmployeeDetails />} />
+            {/* <Route path="employeesdetails" element={<EmployeeDetails />} /> */}
             <Route path="employeesdetails/:id" element={<EmployeeDetailPage />} />
           </Route>
         </Route>

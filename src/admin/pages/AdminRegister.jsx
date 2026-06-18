@@ -415,54 +415,76 @@ export default function AdminRegister() {
       </div>
 
       {/* Footer Navigation */}
-      <div className=" bottom-0 ">
-        <div className=" mx-auto flex items-center justify-between">
-          <button
-            onClick={handleBack}
-            disabled={activeStep === 0}
-            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeStep === 0
-              ? "text-slate-300 cursor-not-allowed"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              }`}
-          >
-            ← Back
-          </button>
+     <div className="border-t border-slate-200 pt-4 ">
+  <div className="flex items-center justify-between">
+    <button
+      onClick={handleBack}
+      disabled={activeStep === 0}
+      className={`flex items-center gap-1.5 px-3 py-2z rounded-lg text-xs font-medium transition-all ${
+        activeStep === 0
+          ? "text-slate-300 cursor-not-allowed"
+          : "text-slate-600 hover:bg-slate-100"
+      }`}
+    >
+      ← Back
+    </button>
 
-          <span className="hidden md:block text-xs text-slate-400">
-            {STEPS.slice(0, activeStep + 1).map(s => s.label).join(" › ")}
-          </span>
+    <div className="hidden lg:flex items-center gap-1 text-xs text-slate-400">
+      <span>
+        Step {activeStep + 1} of {STEPS.length}
+      </span>
+    </div>
 
-          {activeStep === STEPS.length - 1 ? (
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className={`flex items-center gap-2 px-8 py-2.5 rounded-lg text-sm font-semibold text-white transition-all shadow-sm ${loading
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200"
-                }`}
+    {activeStep === STEPS.length - 1 ? (
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all ${
+          loading
+            ? "bg-green-400 cursor-not-allowed"
+            : "bg-[#74c316] hover:bg-[#67af14] shadow-sm"
+        }`}
+      >
+        {loading ? (
+          <>
+            <svg
+              className="animate-spin h-3.5 w-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                  </svg>
-                  Registering...
-                </>
-              ) : (
-                "Register Employee ✓"
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm shadow-indigo-200"
-            >
-              Next →
-            </button>
-          )}
-        </div>
-      </div>
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+              />
+            </svg>
+            Saving...
+          </>
+        ) : (
+          <>
+            Register
+            <span>✓</span>
+          </>
+        )}
+      </button>
+    ) : (
+      <button
+        onClick={handleNext}
+        className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-all shadow-sm"
+      >
+        Next →
+      </button>
+    )}
+  </div>
+</div>
     </div>
   );
 }
