@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Lock, Mail, Users, ShieldCheck } from "lucide-react";
+import { Lock, Mail, Users, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { loginSuccess } from "../redux/authSlice"; 
 import { joinUserRoom } from "../services/authSocket"; 
 import api from "../services/api"; 
@@ -11,6 +11,7 @@ import api from "../services/api";
 const Login = () => {
   const [roleMode, setRoleMode] = useState("employee"); // "employee" or "admin"
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { register, handleSubmit, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -120,21 +121,42 @@ const Login = () => {
             {errors.email && <span className="text-red-400 text-xs mt-1 block">{errors.email.message}</span>}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-slate-500" />
-              </div>
-              <input
-                type="password"
-                {...register("password", { required: "Password is required" })}
-                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                placeholder="••••••••"
-              />
-            </div>
-            {errors.password && <span className="text-red-400 text-xs mt-1 block">{errors.password.message}</span>}
-          </div>
+     <div>
+  <label className="block text-sm font-medium text-slate-300 mb-1.5">
+    Password
+  </label>
+
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <Lock className="h-5 w-5 text-slate-500" />
+    </div>
+
+    <input
+      type={showPassword ? "text" : "password"}
+      {...register("password", { required: "Password is required" })}
+      className="block w-full pl-10 pr-12 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+      placeholder="••••••••"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+    >
+      {showPassword ? (
+        <EyeOff className="h-5 w-5" />
+      ) : (
+        <Eye className="h-5 w-5" />
+      )}
+    </button>
+  </div>
+
+  {errors.password && (
+    <span className="text-red-400 text-xs mt-1 block">
+      {errors.password.message}
+    </span>
+  )}
+</div>
 
           <button
             type="submit"
