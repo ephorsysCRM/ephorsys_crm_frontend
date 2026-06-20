@@ -26,8 +26,12 @@ export const onlyLetters = (e) => {
 };
 
 export const onlyAlphaNum = (e) => {
-  if (!/[A-Za-z0-9\/-_\b]/.test(e.key) && !["ArrowLeft", "ArrowRight", "Delete", "Tab", "Backspace"].includes(e.key))
+  if (
+    !/[A-Za-z0-9/_-]/.test(e.key) &&
+    !["ArrowLeft", "ArrowRight", "Delete", "Tab", "Backspace"].includes(e.key)
+  ) {
     e.preventDefault();
+  }
 };
 
 export const onlyUpperAlphaNum = (e) => {
@@ -193,33 +197,62 @@ export const PasswordInput = ({
   </FieldWrapper>
 );
 
-export const FileUpload = ({ label, file, setFile, accept = "*", multiple = false }) => (
+export const FileUpload = ({
+  label,
+  file,
+  setFile,
+  accept = "*",
+  multiple = false,
+}) => (
   <FieldWrapper label={label}>
-    <label
-      className={cls(
-        "flex items-center gap-3 border border-dashed rounded-lg px-3 py-3 cursor-pointer transition-all text-sm",
-        file
-          ? "border-emerald-400 bg-emerald-50/60 text-emerald-700"
-          : "border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/40 text-slate-500"
-      )}
-    >
-      <span className="text-lg flex-shrink-0">{file ? "✅" : "📎"}</span>
-      <span className="truncate flex-1">
-        {file ? (multiple ? `${file.length} file(s) selected` : file.name) : "Choose file…"}
-      </span>
-      <input
-        className="hidden"
-        type="file"
-        accept={accept}
-        multiple={multiple}
-        onChange={(e) => {
-          if (multiple) {
-            setFile(e.target.files);
-          } else {
-            setFile(e.target.files[0] || null);
-          }
-        }}
-      />
-    </label>
+    <div className="flex items-center gap-4 " >
+      <label className="relative cursor-pointer group">
+        {file ? (
+          <img
+            src={URL.createObjectURL(file)}
+            alt="Profile"
+            className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+          />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center">
+            <span className="text-2xl">👤</span>
+          </div>
+        )}
+
+        {/* Edit Button */}
+        <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition">
+          ✎
+        </div>
+
+        <input
+          className="hidden"
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          onChange={(e) => {
+            if (multiple) {
+              setFile(e.target.files);
+            } else {
+              setFile(e.target.files[0] || null);
+            }
+          }}
+        />
+      </label>
+
+      <div>
+        <h4 className="text-sm font-semibold text-slate-800">
+          Profile Photo
+        </h4>
+        <p className="text-xs text-slate-500">
+          Upload JPG, PNG or WEBP
+        </p>
+
+        {file && (
+          <p className="text-xs text-emerald-600 mt-1">
+            ✓ Photo selected
+          </p>
+        )}
+      </div>
+    </div>
   </FieldWrapper>
 );

@@ -7,17 +7,25 @@ import {
   Minimize,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import Modal from "../../components/ui/Modal";
 import LogoutModal from "../../components/Modals/LogoutModal";
 
 const AdminTopBar = ({ setSidebarOpen }) => {
   const [profileOpen, setProfileOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
+  const dropdownRef = useRef(null);
 
+  // Redux State
+  const { user, role } = useSelector((state) => state.auth);
+
+const { admin } = useSelector((state) => state.auth);
+
+const adminName = admin?.user?.name || "Admin";
+const adminRole = admin?.role || "ADMIN";
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -28,17 +36,38 @@ const AdminTopBar = ({ setSidebarOpen }) => {
 
     document.addEventListener("mousedown", handleClickOutside);
 
-    return () =>
+    return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener(
+      "fullscreenchange",
+      handleFullscreenChange
+    );
+
+    return () => {
+      document.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange
+      );
+    };
   }, []);
 
   const toggleFullscreen = async () => {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      await document.exitFullscreen();
-      setIsFullscreen(false);
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -91,7 +120,7 @@ const AdminTopBar = ({ setSidebarOpen }) => {
         {/* Fullscreen */}
         <button
           onClick={toggleFullscreen}
-          className="w-10 h-10 rounded-xl border border-[var(--border-color)] hover:bg-[var(--primary-50)] flex items-center justify-center transition cursor-pointer"
+          className="w-10 h-10 rounded-xl border border-[var(--border-color)] hover:bg-[var(--primary-50)] flex items-center justify-center transition"
         >
           {isFullscreen ? (
             <Minimize
@@ -109,15 +138,15 @@ const AdminTopBar = ({ setSidebarOpen }) => {
         {/* Profile */}
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setProfileOpen((o) => !o)}
+            onClick={() => setProfileOpen((prev) => !prev)}
             className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-2xl hover:bg-[var(--primary-50)] transition"
           >
             <div className="hidden sm:block text-right">
               <p className="text-[13px] font-semibold text-slate-800">
-                Manoj
+                {adminName}
               </p>
               <p className="text-[11px] uppercase tracking-wider text-slate-400">
-                Admin
+                {role || "ADMIN"}
               </p>
             </div>
 
@@ -134,7 +163,6 @@ const AdminTopBar = ({ setSidebarOpen }) => {
                 exit={{ opacity: 0, y: -8 }}
                 className="absolute right-0 mt-3 w-60 bg-white border border-[var(--border-color)] rounded-2xl shadow-xl overflow-hidden"
               >
-                {/* Top */}
                 <div className="p-4 bg-[var(--primary-50)] border-b border-[var(--primary-100)]">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-[var(--primary)] text-white flex items-center justify-center">
@@ -143,16 +171,15 @@ const AdminTopBar = ({ setSidebarOpen }) => {
 
                     <div>
                       <h3 className="text-sm font-semibold text-slate-800">
-                        Manoj Kumar
+                        {adminName}
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Super Admin
+                        {role || "ADMIN"}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Menu */}
                 <div className="p-2">
                   <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--primary-50)] transition text-sm text-slate-700">
                     <User size={16} />
@@ -160,10 +187,10 @@ const AdminTopBar = ({ setSidebarOpen }) => {
                   </button>
                 </div>
 
-                {/* Logout */}
                 <div className="p-2 border-t border-slate-100">
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 transition text-sm text-red-500"
+                  <button
                     onClick={() => setLogoutOpen(true)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 transition text-sm text-red-500"
                   >
                     <LogOut size={16} />
                     Logout
@@ -174,17 +201,13 @@ const AdminTopBar = ({ setSidebarOpen }) => {
           </AnimatePresence>
         </div>
 
-
-        {/* Logout Modal */}
         <Modal
           isOpen={logoutOpen}
           onClose={() => setLogoutOpen(false)}
           title="Logout"
           size="sm"
         >
-          <LogoutModal
-            onClose={() => setLogoutOpen(false)}
-          />
+          <LogoutModal onClose={() => setLogoutOpen(false)} />
         </Modal>
       </div>
     </motion.header>
