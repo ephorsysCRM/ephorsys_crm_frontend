@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Lock, Mail, Users, ShieldCheck, Eye, EyeOff } from "lucide-react";
-import { loginSuccess } from "../redux/authSlice"; 
+import { loginSuccess } from "../redux/features/auth/authSlice";
 import { joinUserRoom } from "../services/authSocket"; 
 import api from "../services/api"; 
 
@@ -16,13 +16,14 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const rehydrated = useSelector((state) => state._persist?.rehydrated);
   const { isAuthenticated, role } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (rehydrated && isAuthenticated) {
       navigate(role === "admin" ? "/admin/dashboard" : "/bde/dashboard");
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [rehydrated, isAuthenticated, role, navigate]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);

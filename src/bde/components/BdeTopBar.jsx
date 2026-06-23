@@ -11,7 +11,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../redux/authSlice";
+import { logoutSuccess } from "../../redux/features/auth/authSlice";
 import Modal from "../../components/ui/Modal";
 import LogoutModal from "../../components/Modals/LogoutModal";
 
@@ -27,8 +27,8 @@ const TopBar = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem("persist:root");
+    dispatch(logoutSuccess());
+    localStorage.removeItem("persist:crm-root");
     navigate("/");
   };
   const [isFullscreen, setIsFullscreen] = useState(false);
