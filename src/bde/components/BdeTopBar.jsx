@@ -14,9 +14,15 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
 
 const TopBar = ({ setSidebarOpen }) => {
-  const [profileOpen, setProfileOpen] = useState(false);
+const [profileOpen, setProfileOpen] = useState(false);
   
-  const { user } = useSelector((state) => state.auth);
+const auth = useSelector((state) => state.auth);
+
+console.log("Auth:", auth);
+
+const user = auth?.admin?.user;
+
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -190,7 +196,7 @@ const TopBar = ({ setSidebarOpen }) => {
             {/* User Info */}
             <div className="hidden sm:block text-right">
               <p className="text-[13px] font-medium text-slate-800 leading-tight">
-                {user?.firstName || user?.name || "User"}
+                {user?.firstName || user?.lastName || "User"}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider text-slate-400 leading-tight">
@@ -263,13 +269,13 @@ const TopBar = ({ setSidebarOpen }) => {
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      {user?.firstName} {user?.lastName}
-                    </p>
+                <p className="text-[13px] font-medium text-slate-800 leading-tight">
+  {user?.firstName || user?.name || "User"}
+</p>
 
-                    <p className="text-xs text-slate-400">
-                      {user?.officialEmail || "bde@company.com"}
-                    </p>
+<p className="text-xs text-slate-400">
+  {user?.officialEmail || user?.email || ""}
+</p>
                   </div>
                 </div>
 
