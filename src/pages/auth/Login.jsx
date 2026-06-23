@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Lock, Mail, Users, ShieldCheck } from "lucide-react";
-import { loginSuccess } from "../../redux/authSlice";
+import { loginSuccess } from "../../redux/features/auth/authSlice";
 import { joinUserRoom } from "../../services/authSocket";
 import api from "../../services/api";
 
