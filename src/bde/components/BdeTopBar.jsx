@@ -12,22 +12,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
+import Modal from "../../components/ui/Modal";
+import LogoutModal from "../../components/Modals/LogoutModal";
 
 const TopBar = ({ setSidebarOpen }) => {
-const [profileOpen, setProfileOpen] = useState(false);
-  
-const auth = useSelector((state) => state.auth);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
-console.log("Auth:", auth);
+  const auth = useSelector((state) => state.auth);
 
-const user = auth?.admin?.user;
-
+  const user = auth?.admin?.user;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     dispatch(logout());
+    localStorage.removeItem("persist:root");
     navigate("/");
   };
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -43,8 +44,7 @@ const user = auth?.admin?.user;
 
     document.addEventListener("mousedown", handleClickOutside);
 
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Fullscreen Toggle
@@ -142,10 +142,7 @@ const user = auth?.admin?.user;
             border border-[var(--primary-100)]
           "
         >
-          <CalendarDays
-            size={15}
-            className="text-[var(--primary-600)]"
-          />
+          <CalendarDays size={15} className="text-[var(--primary-600)]" />
 
           <span className="text-xs font-medium text-[var(--primary-700)]">
             {today}
@@ -167,15 +164,9 @@ const user = auth?.admin?.user;
           "
         >
           {isFullscreen ? (
-            <Minimize
-              size={18}
-              className="text-[var(--primary-600)]"
-            />
+            <Minimize size={18} className="text-[var(--primary-600)]" />
           ) : (
-            <Maximize
-              size={18}
-              className="text-[var(--primary-600)]"
-            />
+            <Maximize size={18} className="text-[var(--primary-600)]" />
           )}
         </motion.button>
 
@@ -269,13 +260,13 @@ const user = auth?.admin?.user;
                   </div>
 
                   <div>
-                <p className="text-[13px] font-medium text-slate-800 leading-tight">
-  {user?.firstName || user?.name || "User"}
-</p>
+                    <p className="text-[13px] font-medium text-slate-800 leading-tight">
+                      {user?.firstName || user?.name || "User"}
+                    </p>
 
-<p className="text-xs text-slate-400">
-  {user?.officialEmail || user?.email || ""}
-</p>
+                    <p className="text-xs text-slate-400">
+                      {user?.officialEmail || user?.email || ""}
+                    </p>
                   </div>
                 </div>
 
@@ -296,43 +287,47 @@ const user = auth?.admin?.user;
                       transition
                     "
                   >
-                    <User
-                      size={15}
-                      className="text-slate-400"
-                    />
-
+                    <User size={15} className="text-slate-400" />
                     My Profile
                   </motion.button>
                 </div>
 
                 {/* Logout */}
                 <div className="border-t border-slate-100 p-1.5">
-                  <motion.button
-                    onClick={handleLogout}
-                    whileHover={{
-                      backgroundColor: "#fef2f2",
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    className="
-                      w-full
-                      flex items-center gap-2.5
-                      px-3 py-2.5
-                      rounded-lg
-                      text-[13px]
-                      text-red-500
-                      transition
-                      cursor-pointer
-                    "
-                  >
-                    <LogOut size={15} />
-                    Sign out
-                  </motion.button>
-                </div>
+  <motion.button
+    onClick={() => setLogoutOpen(true)}
+    whileHover={{
+      backgroundColor: "#fef2f2",
+    }}
+    whileTap={{ scale: 0.98 }}
+    className="
+      w-full
+      flex items-center gap-2.5
+      px-3 py-2.5
+      rounded-lg
+      text-[13px]
+      text-red-500
+      transition
+      cursor-pointer
+    "
+  >
+    <LogOut size={15} />
+    Sign out
+  </motion.button>
+</div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+      <Modal
+  isOpen={logoutOpen}
+  onClose={() => setLogoutOpen(false)}
+  title="Logout"
+  size="sm"
+>
+  <LogoutModal onClose={() => setLogoutOpen(false)} />
+</Modal>
     </motion.header>
   );
 };
