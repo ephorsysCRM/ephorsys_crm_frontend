@@ -8,9 +8,10 @@ import {
   Flame, 
   Kanban,
   PlusCircle
+  
 } from "lucide-react";
 import { useState } from "react";
-import { logout } from "../redux/authSlice";
+import { logoutSuccess } from "../redux/features/auth/authSlice";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,8 +20,8 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+    dispatch(logoutSuccess());
+    navigate("/");
   };
 
   const navLinks = [

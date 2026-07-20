@@ -2,15 +2,20 @@ import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({ allowedRole }) => {
+  const rehydrated = useSelector((state) => state._persist?.rehydrated);
   const { isAuthenticated, role } = useSelector((state) => state.auth);
-  
+
+  if (!rehydrated) {
+    return null;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
   if (allowedRole && role !== allowedRole) {
-    if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-    if (role === 'employee') return <Navigate to="/bde/dashboard" replace />;
+    if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
+    if (role === "employee") return <Navigate to="/bde/dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 
