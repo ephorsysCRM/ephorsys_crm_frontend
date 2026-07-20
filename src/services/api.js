@@ -14,7 +14,8 @@ const api = axios.create({
 
 const getAuthToken = () => {
   const { auth } = store.getState();
-  return auth?.user?.token || auth?.admin?.user?.token || auth?.admin?.token;
+  // After loginSuccess: { user: response.data.data, role } → token lives at auth.user.token
+  return auth?.user?.token;
 };
 
 api.interceptors.request.use((config) => {
