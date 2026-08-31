@@ -48,16 +48,16 @@ const NAV_ITEMS = [
   //   label: "Employees Details",
   //   icon: BriefcaseBusiness,
   // },
-  {
-    path: "/admin/analytics",
-    label: "Analytics",
-    icon: BarChart3,
-  },
-  {
-    path: "/admin/settings",
-    label: "Settings",
-    icon: Settings,
-  },
+  // {
+  //   path: "/admin/analytics",
+  //   label: "Analytics",
+  //   icon: BarChart3,
+  // },
+  // {
+  //   path: "/admin/settings",
+  //   label: "Settings",
+  //   icon: Settings,
+  // },
 ];
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
