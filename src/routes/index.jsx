@@ -11,12 +11,14 @@ import AdminBdeperformance from "../admin/pages/Bdeperformance";
 // import EmployeeDetails from "../admin/pages/EmployeeDetails";
 import EmployeeDetailPage from "../admin/pages/EmployeeDetailPage";
 import AdminRegister from "../admin/pages/AdminRegister";
+import AdminHappyClients from "../admin/pages/HappyClients";
 
 
 // BDE Layout & Pages
 import BdeLayout from "../layout/BdeLayout";
 import BdeDashboard from "../bde/pages/BdeDashboard";
 import BdeLead from "../bde/pages/Lead";
+import BdeHappyClients from "../bde/pages/HappyClients";
 import AllEmployeeList from "../admin/pages/AllEmployeeList";
 
 
@@ -36,6 +38,7 @@ const AppRoutes = () => {
             <Route path="allemloyees" element={<AllEmployeeList />} />
 
             <Route path="leads" element={<AdminLead />} />
+            <Route path="happy-clients" element={<AdminHappyClients />} />
             <Route path="employees" element={<AdminBdeperformance />} />
             {/* <Route path="employeesdetails" element={<EmployeeDetails />} /> */}
             <Route path="employeesdetails/:id" element={<EmployeeDetailPage />} />
@@ -48,6 +51,7 @@ const AppRoutes = () => {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<BdeDashboard />} />
             <Route path="leads" element={<BdeLead />} />
+            <Route path="happy-clients" element={<BdeHappyClients />} />
           </Route>
         </Route>
 
@@ -58,4 +62,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes;
+export default AppRoutes;

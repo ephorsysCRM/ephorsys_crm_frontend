@@ -6,7 +6,8 @@ import {
   Settings,
   BriefcaseBusiness,
   BarChart3,
-  UserPlus
+  UserPlus,
+  Trophy,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -33,6 +34,11 @@ const NAV_ITEMS = [
     icon: Users,
   },
   {
+    path: "/admin/happy-clients",
+    label: "Happy Clients",
+    icon: Trophy,
+  },
+  {
     path: "/admin/employees",
     label: "Bde performance ",
     icon: BriefcaseBusiness,
@@ -42,16 +48,16 @@ const NAV_ITEMS = [
   //   label: "Employees Details",
   //   icon: BriefcaseBusiness,
   // },
-  {
-    path: "/admin/analytics",
-    label: "Analytics",
-    icon: BarChart3,
-  },
-  {
-    path: "/admin/settings",
-    label: "Settings",
-    icon: Settings,
-  },
+  // {
+  //   path: "/admin/analytics",
+  //   label: "Analytics",
+  //   icon: BarChart3,
+  // },
+  // {
+  //   path: "/admin/settings",
+  //   label: "Settings",
+  //   icon: Settings,
+  // },
 ];
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {

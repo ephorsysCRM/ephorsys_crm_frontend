@@ -34,7 +34,7 @@ const LogoutModal = ({ onClose }) => {
     <div className="w-full">
       {/* Content */}
       <div className="mt-6 text-center">
-        <h2 className="text-2xl font-bold text-[var(--primary-700)]">
+        <h2 className="text-2xl font-bold text-[#4a7d0d]">
           Logout Account
         </h2>
 
@@ -55,11 +55,11 @@ const LogoutModal = ({ onClose }) => {
           className="
             h-12
             rounded-2xl
-            border border-[var(--primary-100)]
+            border border-[#74C316]/25
             bg-white
-            hover:bg-[var(--primary-50)]
+            hover:bg-[#74C316]/10
             text-sm font-semibold
-            text-[var(--primary-700)]
+            text-[#4a7d0d]
             transition-all duration-300
             cursor-pointer
             flex items-center justify-center gap-2
@@ -83,16 +83,16 @@ const LogoutModal = ({ onClose }) => {
             h-12
             rounded-2xl
             bg-gradient-to-r
-            from-[var(--primary-600)]
-            to-[var(--primary-500)]
-            hover:from-[var(--primary-700)]
-            hover:to-[var(--primary-600)]
+            from-[#63A613]
+            to-[#74C316]
+            hover:from-[#4a7d0d]
+            hover:to-[#63A613]
             text-white
             text-sm font-semibold
             transition-all duration-300
             cursor-pointer
             flex items-center justify-center gap-2
-            shadow-lg shadow-[var(--primary-600)]/30
+            shadow-lg shadow-[#63A613]/30
             disabled:opacity-70
             disabled:cursor-not-allowed
           "
