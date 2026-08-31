@@ -23,44 +23,51 @@ import socket from "../../services/socket.js";
 import MetricListModal from "../components/MetricListModal";
 import LeadDetailModal from "../components/LeadDetailModal";
 
-const StatCard = ({ title, value, icon: Icon, accent, tagText, tagOk, delay, onClick }) => (
+const StatCard = ({ title, value, icon: Icon, accent, tagText, tagOk, tagColors, delay, onClick }) => (
   <motion.div
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4, ease: "easeOut" }}
-    whileHover={{ y: -3 }}
+    whileHover={{ y: -4 }}
+    whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className="relative bg-white border border-slate-200/70 rounded-2xl p-5 shadow-[0_2px_12px_rgb(0,0,0,0.03)] hover:shadow-[0_10px_28px_rgb(0,0,0,0.07)] transition-shadow duration-300 overflow-hidden cursor-pointer group"
+    className="relative bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_12px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgb(0,0,0,0.08)] transition-all duration-300 overflow-hidden cursor-pointer group flex flex-col justify-between"
   >
     {/* Accent strip */}
-    <div className={`absolute top-0 left-0 w-full h-[3px] ${accent.strip}`} />
+    <div className={`absolute top-0 left-0 w-full h-[3.5px] ${accent.strip}`} />
 
-    <div className="flex items-start justify-between mb-4">
-      <div
-        className={`w-11 h-11 rounded-xl flex items-center justify-center ${accent.bg}`}
-      >
-        <Icon size={20} className={accent.text} />
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <div
+          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 ${accent.bg}`}
+        >
+          <Icon size={20} className={accent.text} />
+        </div>
+
+        {tagText && (
+          <span
+            className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full border ${
+              tagColors || (tagOk ? "bg-[#74C316]/12 text-[#4a7d0d] border-[#74C316]/25" : "bg-red-50 text-red-600 border-red-200/60")
+            }`}
+          >
+            {tagOk && <CheckCircle2 size={11} />}
+            {tagText}
+          </span>
+        )}
       </div>
 
-      {tagText && (
-        <span
-          className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${
-            tagOk
-              ? "bg-[#74C316]/12 text-[#4a7d0d]"
-              : "bg-red-50 text-red-600"
-          }`}
-        >
-          {tagOk && <CheckCircle2 size={11} />}
-          {tagText}
-        </span>
-      )}
+      <div className="flex items-end justify-between">
+        <div>
+          <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none mb-1.5">
+            {value}
+          </h3>
+          <p className="text-[13px] font-semibold text-slate-500">{title}</p>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#74C316]/12 flex items-center justify-center transition-colors shrink-0">
+          <ChevronRight size={16} className="text-slate-400 group-hover:text-[#4a7d0d] transition-colors" />
+        </div>
+      </div>
     </div>
-
-    <h3 className="text-[26px] font-extrabold text-slate-900 leading-none mb-1.5 flex items-center justify-between">
-      <span>{value}</span>
-      <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
-    </h3>
-    <p className="text-[13px] font-medium text-slate-500">{title}</p>
   </motion.div>
 );
 
@@ -221,6 +228,7 @@ const BdeDashboard = () => {
           }}
           tagText="All time"
           tagOk={true}
+          tagColors="bg-[#74C316]/12 text-[#4a7d0d] border-[#74C316]/25"
           delay={0.1}
           onClick={() => setActiveListModal({ type: "all", title: "Total Leads" })}
         />
@@ -235,6 +243,7 @@ const BdeDashboard = () => {
           }}
           tagText="Today"
           tagOk={true}
+          tagColors="bg-blue-50 text-blue-700 border-blue-200/60"
           delay={0.2}
           onClick={() => setActiveListModal({ type: "todayAttempted", title: "Today's Calls Attempted" })}
         />
@@ -243,12 +252,13 @@ const BdeDashboard = () => {
           value={stats.todayMeetings}
           icon={CalendarCheck}
           accent={{
-            bg: "bg-violet-50",
-            text: "text-violet-600",
-            strip: "bg-violet-500",
+            bg: "bg-purple-50",
+            text: "text-purple-600",
+            strip: "bg-purple-500",
           }}
           tagText="Scheduled"
           tagOk={true}
+          tagColors="bg-purple-50 text-purple-700 border-purple-200/60"
           delay={0.3}
           onClick={() => setActiveListModal({ type: "todayMeetings", title: "Today's Scheduled Meetings" })}
         />
@@ -267,6 +277,11 @@ const BdeDashboard = () => {
           }
           tagText={stats.missedFollowUps > 0 ? "Needs attention" : "On track"}
           tagOk={stats.missedFollowUps === 0}
+          tagColors={
+            stats.missedFollowUps > 0
+              ? "bg-red-50 text-red-600 border-red-200/60"
+              : "bg-[#74C316]/12 text-[#4a7d0d] border-[#74C316]/25"
+          }
           delay={0.4}
           onClick={() => setActiveListModal({ type: "missed", title: "Missed Follow-ups" })}
         />

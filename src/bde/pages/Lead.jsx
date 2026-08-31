@@ -15,6 +15,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  User,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
@@ -239,15 +241,16 @@ export default function Lead() {
     }
   };
 
-  const statusColors = {
-    New: "bg-blue-100 text-blue-700",
-    Attempted: "bg-indigo-100 text-indigo-700",
-    Interested: "bg-amber-100 text-amber-700",
-    "Not Picked": "bg-slate-100 text-slate-700",
-    Meeting: "bg-purple-100 text-purple-700",
-    "Closed Won": "bg-emerald-100 text-emerald-700",
-    "Closed Lost": "bg-red-100 text-red-700",
-    Rejected: "bg-rose-100 text-rose-700",
+  // Dot color for the status badge indicator
+  const statusDotColors = {
+    New: "bg-blue-500",
+    Attempted: "bg-indigo-500",
+    Interested: "bg-amber-500",
+    "Not Picked": "bg-slate-400",
+    Meeting: "bg-purple-500",
+    "Closed Won": "bg-emerald-500",
+    "Closed Lost": "bg-red-500",
+    Rejected: "bg-rose-500",
   };
 
   return (
@@ -255,108 +258,161 @@ export default function Lead() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Lead Management</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-[#74C316]">Lead Management</h1>
+          <p className="text-slate-800 text-sm mt-1">
             Track, update, and manage your assigned leads.
           </p>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => setShowCreateModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium shadow-sm transition-all shadow-indigo-200 shrink-0"
+          className="bg-[#74C316] hover:bg-[#63A613] text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium shadow-sm transition-colors shadow-[#74C316]/30 shrink-0"
         >
           <Plus size={18} />
           Create Lead
-        </button>
+        </motion.button>
       </div>
 
       {/* Metrics Ribbon */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div
-            onClick={() =>
-              setActiveListModal({
-                type: "todayAttempted",
-                title: "Today Attempted Calls",
-              })
-            }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all"
+ {stats && (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <motion.div
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      onClick={() =>
+        setActiveListModal({
+          type: "todayAttempted",
+          title: "Today Attempted Calls",
+        })
+      }
+      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-[#74C316]/40 hover:shadow-md transition-shadow"
+    >
+      <div className="bg-blue-50 p-3 rounded-full text-blue-600 shrink-0">
+        <PhoneCall size={20} />
+      </div>
+      <div>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          Today Attempted
+        </p>
+        <AnimatePresence mode="wait">
+          <motion.h3
+            key={stats.todayAttempted}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+            className="text-xl font-bold text-slate-800"
           >
-            <div className="bg-blue-100 p-2.5 rounded-lg text-blue-600">
-              <PhoneCall size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium uppercase">
-                Today Attempted
-              </p>
-              <h3 className="text-xl font-bold text-slate-800">
-                {stats.todayAttempted}
-              </h3>
-            </div>
-          </div>
-          <div
-            onClick={() =>
-              setActiveListModal({
-                type: "todayFollowUps",
-                title: "Daily Follow-ups",
-              })
-            }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all"
-          >
-            <div className="bg-amber-100 p-2.5 rounded-lg text-amber-600">
-              <ListTodo size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium uppercase">
-                Daily Follow-ups
-              </p>
-              <h3 className="text-xl font-bold text-slate-800">
-                {stats.todayFollowUps}
-              </h3>
-            </div>
-          </div>
-          <div
-            onClick={() =>
-              setActiveListModal({ type: "todayMeetings", title: "Today's Meetings" })
-            }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all"
-          >
-            <div className="bg-purple-100 p-2.5 rounded-lg text-purple-600">
-              <Handshake size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium uppercase">
-                Today's Meetings
-              </p>
-              <h3 className="text-xl font-bold text-slate-800">
-                {stats.todayMeetings}
-              </h3>
-            </div>
-          </div>
-          <div
-            onClick={() =>
-              setActiveListModal({ type: "missed", title: "Missed Follow-ups" })
-            }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-red-300 hover:shadow-md transition-all"
-          >
-            <div
-              className={`p-2.5 rounded-lg ${stats.missedFollowUps > 0 ? "bg-red-100 text-red-600" : "bg-slate-100 text-slate-600"}`}
-            >
-              <AlertCircle size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium uppercase">
-                Missed Follow-ups
-              </p>
-              <h3 className="text-xl font-bold text-slate-800">
-                {stats.missedFollowUps}
-              </h3>
-            </div>
-          </div>
-        </div>
-      )}
+            {stats.todayAttempted}
+          </motion.h3>
+        </AnimatePresence>
+      </div>
+    </motion.div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100/80 p-1 rounded-xl mb-6 self-start">
+    <motion.div
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      onClick={() =>
+        setActiveListModal({
+          type: "todayFollowUps",
+          title: "Daily Follow-ups",
+        })
+      }
+      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-[#74C316]/40 hover:shadow-md transition-shadow"
+    >
+      <div className="bg-amber-50 p-3 rounded-full text-amber-600 shrink-0">
+        <ListTodo size={20} />
+      </div>
+      <div>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          Daily Follow-ups
+        </p>
+        <AnimatePresence mode="wait">
+          <motion.h3
+            key={stats.todayFollowUps}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+            className="text-xl font-bold text-slate-800"
+          >
+            {stats.todayFollowUps}
+          </motion.h3>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+
+    <motion.div
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      onClick={() =>
+        setActiveListModal({ type: "todayMeetings", title: "Today's Meetings" })
+      }
+      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-shadow"
+    >
+      <div className="bg-purple-50 p-3 rounded-full text-purple-600 shrink-0">
+        <Handshake size={20} />
+      </div>
+      <div>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          Today's Meetings
+        </p>
+        <AnimatePresence mode="wait">
+          <motion.h3
+            key={stats.todayMeetings}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+            className="text-xl font-bold text-slate-800"
+          >
+            {stats.todayMeetings}
+          </motion.h3>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+
+    <motion.div
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      onClick={() =>
+        setActiveListModal({ type: "missed", title: "Missed Follow-ups" })
+      }
+      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-red-300 hover:shadow-md transition-shadow"
+    >
+      <div
+        className={`p-3 rounded-full shrink-0 ${stats.missedFollowUps > 0 ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-500"}`}
+      >
+        <AlertCircle size={20} />
+      </div>
+      <div>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          Missed Follow-ups
+        </p>
+        <AnimatePresence mode="wait">
+          <motion.h3
+            key={stats.missedFollowUps}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+            className={`text-xl font-bold ${stats.missedFollowUps > 0 ? "text-red-600" : "text-slate-800"}`}
+          >
+            {stats.missedFollowUps}
+          </motion.h3>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  </div>
+)}
+
+      {/* Tabs — pill style */}
+      <div className="flex items-center gap-2 mb-6">
         {[
           { id: "all", label: "All Leads", icon: Users },
           { id: "pipeline", label: "Pipeline", icon: Kanban },
@@ -365,13 +421,13 @@ export default function Lead() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
               activeTab === tab.id
-                ? "bg-white text-indigo-700 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                ? "bg-white text-[#5c9412] shadow-sm border border-slate-200"
+                : "text-orange-500 hover:text-slate-700 border border-transparent"
             }`}
           >
-            <tab.icon size={16} />
+            <tab.icon size={16} className={activeTab === tab.id ? "text-[#74C316]" : ""} />
             {tab.label}
           </button>
         ))}
@@ -381,7 +437,7 @@ export default function Lead() {
       <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 relative">
         {loading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-10">
-            <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-2" />
+            <Loader2 className="w-8 h-8 text-[#74C316] animate-spin mb-2" />
             <span className="text-sm font-medium text-slate-500">
               Loading leads...
             </span>
@@ -390,10 +446,10 @@ export default function Lead() {
         {/* Tab 1: All Leads Table */}
        {activeTab === "all" && (
   <div className="h-full flex flex-col">
-    {/* Search Bar */}
-    <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/50">
-      <div className="relative max-w-md">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+    {/* Search + Filters Bar */}
+    <div className="px-6 py-4 flex items-center gap-3">
+      <div className="relative flex-1">
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           value={search}
@@ -407,7 +463,7 @@ export default function Lead() {
             }, 350);
           }}
           placeholder="Search by name or phone number..."
-          className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+          className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-full text-sm outline-none focus:ring-2 focus:ring-[#74C316]/40 focus:border-[#74C316] bg-white transition-shadow"
         />
         {search && (
           <button
@@ -416,7 +472,7 @@ export default function Lead() {
               setCurrentPage(1);
               fetchData(1, "");
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
           >
             <XCircle size={15} />
           </button>
@@ -426,20 +482,20 @@ export default function Lead() {
 
     <table className="w-full text-left border-collapse">
       <thead>
-        <tr className="bg-slate-50 border-b border-slate-200">
-          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+        <tr className="border-b border-slate-100">
+          <th className="px-6 py-3 text-[11px] font-bold text-red-500 uppercase tracking-wider">
             Lead Name
           </th>
-          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+          <th className="px-6 py-3 text-[11px] font-bold text-red-500 uppercase tracking-wider">
             Mobile
           </th>
-          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+          <th className="px-6 py-3 text-[11px] font-bold text-red-500 uppercase tracking-wider">
             Status
           </th>
-          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+          <th className="px-6 py-3 text-[11px] font-bold text-red-500 uppercase tracking-wider">
             Project
           </th>
-          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase text-right">
+          <th className="px-6 py-3 text-[11px] font-bold text-red-500 uppercase tracking-wider text-right">
             Actions
           </th>
         </tr>
@@ -458,23 +514,31 @@ export default function Lead() {
               key={lead._id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="hover:bg-slate-50 transition-colors"
+              className="hover:bg-slate-50/70 transition-colors"
             >
-              <td className="px-6 py-4 font-medium text-slate-900">
-                {lead.fullName}
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#74C316]/10 flex items-center justify-center shrink-0">
+                    <User size={16} className="text-[#5c9412]" />
+                  </div>
+                  <span className="font-medium text-slate-900">
+                    {lead.fullName}
+                  </span>
+                </div>
               </td>
 
               <td className="px-6 py-4 text-slate-600">
-                {lead.mobileNumber}
+                <span className="flex items-center gap-2">
+                  <Phone size={14} className="text-blue-400" />
+                  {lead.mobileNumber}
+                </span>
               </td>
 
               <td className="px-6 py-4">
-                <span
-                  className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                    statusColors[lead.leadStatus] ||
-                    "bg-slate-100 text-slate-600"
-                  }`}
-                >
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-600">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${statusDotColors[lead.leadStatus] || "bg-slate-400"}`}
+                  />
                   {lead.leadStatus}
                 </span>
               </td>
@@ -486,8 +550,9 @@ export default function Lead() {
               <td className="px-6 py-4 text-right">
                 <button
                   onClick={() => setSelectedLeadId(lead._id)}
-                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#74C316]/40 text-[#5c9412] text-xs font-semibold hover:bg-[#74C316]/10 transition-colors"
                 >
+                  <Eye size={13} />
                   View &amp; Update
                 </button>
               </td>
@@ -514,7 +579,7 @@ export default function Lead() {
               setCurrentPage(p);
               fetchData(p, search);
             }}
-            className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+            className="p-2 rounded-full border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
           >
             <ChevronLeft size={15} />
           </button>
@@ -551,9 +616,9 @@ export default function Lead() {
                     setCurrentPage(p);
                     fetchData(p, search);
                   }}
-                  className={`w-9 h-9 text-sm rounded-lg border font-medium transition-colors ${
+                  className={`w-9 h-9 text-sm rounded-full border font-medium transition-all active:scale-95 ${
                     currentPage === p
-                      ? "bg-indigo-600 text-white border-indigo-600"
+                      ? "bg-[#74C316] text-white border-[#74C316]"
                       : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                   }`}
                 >
@@ -570,7 +635,7 @@ export default function Lead() {
               setCurrentPage(p);
               fetchData(p, search);
             }}
-            className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+            className="p-2 rounded-full border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 active:scale-95 transition-all"
           >
             <ChevronRight size={15} />
           </button>
@@ -594,9 +659,9 @@ export default function Lead() {
                   <button
                     key={stage}
                     onClick={() => setActivePipelineStage(stage)}
-                    className={`shrink-0 px-5 py-3 rounded-xl text-sm font-semibold transition-all border ${
+                    className={`shrink-0 px-5 py-3 rounded-full text-sm font-semibold transition-all border active:scale-95 ${
                       activePipelineStage === stage
-                        ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                        ? "bg-[#74C316] text-white border-[#74C316] shadow-md"
                         : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
@@ -630,25 +695,32 @@ export default function Lead() {
               {pipeline[activePipelineStage]?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {pipeline[activePipelineStage].map((lead) => (
-                    <div
+                    <motion.div
                       key={lead._id}
+                      whileHover={{ y: -3, scale: 1.01 }}
+                      transition={{ duration: 0.15 }}
                       onClick={() => setSelectedLeadId(lead._id)}
-                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
+                      className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-[#74C316]/40 hover:shadow-md cursor-pointer"
                     >
-                      <h4 className="font-semibold text-slate-900 text-sm">
-                        {lead.fullName}
-                      </h4>
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="w-8 h-8 rounded-full bg-[#74C316]/10 flex items-center justify-center shrink-0">
+                          <User size={14} className="text-[#5c9412]" />
+                        </div>
+                        <h4 className="font-semibold text-slate-900 text-sm">
+                          {lead.fullName}
+                        </h4>
+                      </div>
 
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1 pl-11">
                         {lead.mobileNumber}
                       </p>
 
                       {lead.projectType && (
-                        <p className="text-xs text-indigo-600 mt-3 font-medium bg-indigo-50 inline-block px-2 py-1 rounded-md">
+                        <p className="text-xs text-[#5c9412] mt-3 font-medium bg-[#74C316]/10 inline-block px-2 py-1 rounded-md ml-11">
                           {formatProjectType(lead.projectType)}
                         </p>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               ) : (
@@ -668,9 +740,11 @@ export default function Lead() {
               </div>
             ) : (
               hotlist.map((lead) => (
-                <div
+                <motion.div
                   key={lead._id}
-                  className="bg-white border-2 border-amber-100 rounded-xl p-5 hover:border-amber-300 transition-all shadow-sm"
+                  whileHover={{ y: -3 }}
+                  transition={{ duration: 0.15 }}
+                  className="bg-white border-2 border-amber-100 rounded-xl p-5 hover:border-amber-300 shadow-sm"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-bold text-slate-900">
@@ -692,11 +766,11 @@ export default function Lead() {
                   </div>
                   <button
                     onClick={() => setSelectedLeadId(lead._id)}
-                    className="w-full py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 text-sm font-medium rounded-lg border border-slate-200 transition-colors"
+                    className="w-full py-2 bg-slate-50 hover:bg-[#74C316]/10 hover:text-[#5c9412] text-slate-700 text-sm font-medium rounded-lg border border-slate-200 transition-colors active:scale-95"
                   >
                     Action Required
                   </button>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
@@ -749,7 +823,7 @@ export default function Lead() {
                           fullName: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                       placeholder="John Doe"
                     />
                   </div>
@@ -770,7 +844,7 @@ export default function Lead() {
                           mobileNumber: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                       placeholder="9876543210"
                     />
                   </div>
@@ -789,7 +863,7 @@ export default function Lead() {
                           projectType: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                     >
                       {PROJECT_TYPES.map((type) => (
                         <option key={type} value={type}>
@@ -810,7 +884,7 @@ export default function Lead() {
                           leadSource: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                     >
                       {LEAD_SOURCES.map((source) => (
                         <option key={source} value={source}>
@@ -831,7 +905,7 @@ export default function Lead() {
                     onChange={(e) =>
                       setCreateData({ ...createData, remarks: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                     placeholder="Any initial notes about the client..."
                   ></textarea>
                 </div>
@@ -859,7 +933,7 @@ export default function Lead() {
                           })
                         }
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#74C316]"></div>
                     </label>
                   </div>
 
@@ -882,7 +956,7 @@ export default function Lead() {
                                 initialCallStatus: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                           >
                             {CALL_STATUSES.map((status) => (
                               <option key={status} value={status}>
@@ -908,7 +982,7 @@ export default function Lead() {
                                       isInterested: true,
                                     })
                                   }
-                                  className="text-indigo-600 focus:ring-indigo-500"
+                                  className="text-[#74C316] focus:ring-[#74C316]"
                                 />{" "}
                                 Yes
                               </label>
@@ -923,7 +997,7 @@ export default function Lead() {
                                       isInterested: false,
                                     })
                                   }
-                                  className="text-indigo-600 focus:ring-indigo-500"
+                                  className="text-[#74C316] focus:ring-[#74C316]"
                                 />{" "}
                                 No
                               </label>
@@ -954,7 +1028,7 @@ export default function Lead() {
                                   followUpDate: e.target.value,
                                 })
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                             />
                           </div>
                           <div>
@@ -971,7 +1045,7 @@ export default function Lead() {
                                   followUpTime: e.target.value,
                                 })
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316] focus:border-[#74C316] text-sm transition-shadow"
                             />
                           </div>
                         </div>
@@ -988,12 +1062,14 @@ export default function Lead() {
                   >
                     Cancel
                   </button>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-white bg-[#74C316] hover:bg-[#63A613] rounded-lg shadow-sm transition-colors"
                   >
                     Save Lead
-                  </button>
+                  </motion.button>
                 </div>
               </form>
             </motion.div>

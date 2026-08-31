@@ -121,8 +121,7 @@ const ClientCard = ({ lead, onViewDetails }) => {
       <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#74C316]/10 rounded-full blur-2xl pointer-events-none group-hover:bg-[#74C316]/20 transition-all duration-500" />
 
       {/* Top Banner Accent */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#74C316] rounded-t-2xl" />
-
+     
       <div>
         {/* Header Row: Initials Avatar + Name & Phone + Star Badge */}
         <div className="flex items-start justify-between gap-3 pt-1">
