@@ -7,80 +7,168 @@ import {
   Briefcase,
   Trophy,
   Loader2,
+  Target,
+  ChevronRight,
+  ArrowRight,
+  CheckCircle2,
+  Flame,
+  PhoneMissed,
+  XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import socket from "../../services/socket.js";
+import MetricListModal from "../components/MetricListModal";
+import LeadDetailModal from "../components/LeadDetailModal";
 
-const StatCard = ({ title, value, icon: Icon, color, delay }) => (
+const StatCard = ({ title, value, icon: Icon, accent, tagText, tagOk, delay, onClick }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.4 }}
-    className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between"
+    transition={{ delay, duration: 0.4, ease: "easeOut" }}
+    whileHover={{ y: -3 }}
+    onClick={onClick}
+    className="relative bg-white border border-slate-200/70 rounded-2xl p-5 shadow-[0_2px_12px_rgb(0,0,0,0.03)] hover:shadow-[0_10px_28px_rgb(0,0,0,0.07)] transition-shadow duration-300 overflow-hidden cursor-pointer group"
   >
-    <div>
-      <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-      <h3 className="text-3xl font-bold text-slate-800">{value}</h3>
+    {/* Accent strip */}
+    <div className={`absolute top-0 left-0 w-full h-[3px] ${accent.strip}`} />
+
+    <div className="flex items-start justify-between mb-4">
+      <div
+        className={`w-11 h-11 rounded-xl flex items-center justify-center ${accent.bg}`}
+      >
+        <Icon size={20} className={accent.text} />
+      </div>
+
+      {tagText && (
+        <span
+          className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${
+            tagOk
+              ? "bg-[#74C316]/12 text-[#4a7d0d]"
+              : "bg-red-50 text-red-600"
+          }`}
+        >
+          {tagOk && <CheckCircle2 size={11} />}
+          {tagText}
+        </span>
+      )}
     </div>
-    <div
-      className={`w-12 h-12 rounded-full flex items-center justify-center ${color}`}
-    >
-      <Icon size={24} />
-    </div>
+
+    <h3 className="text-[26px] font-extrabold text-slate-900 leading-none mb-1.5 flex items-center justify-between">
+      <span>{value}</span>
+      <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
+    </h3>
+    <p className="text-[13px] font-medium text-slate-500">{title}</p>
   </motion.div>
 );
 
-const PipelineCard = ({ title, count, colorClass, barClass, total }) => {
-  const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-  return (
-    <div className="mb-6 last:mb-0">
-      <div className="flex justify-between items-center mb-2">
-        <span className={`text-sm font-semibold ${colorClass}`}>{title}</span>
-        <span className="text-sm font-bold text-slate-700">
-          {count}{" "}
-          <span className="text-slate-400 font-normal">({percentage}%)</span>
+const PipelineCard = ({ title, count, percentage, icon: Icon, colors, onClick }) => (
+  <div
+    onClick={onClick}
+    className="group flex items-center gap-4 p-3 -mx-3 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors"
+  >
+    {/* Icon badge */}
+    <div
+      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${colors.badgeBg}`}
+    >
+      <Icon size={18} className={colors.badgeIcon} />
+    </div>
+
+    {/* Label + bar */}
+    <div className="flex-1 min-w-0">
+      <div className="flex justify-between items-center mb-1.5">
+        <span className="text-[13.5px] font-semibold text-slate-800">
+          {title}
         </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-[13.5px] font-bold text-slate-800">
+            {count}
+          </span>
+          <span
+            className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md ${colors.pillBg} ${colors.pillText}`}
+          >
+            {percentage}%
+          </span>
+        </div>
       </div>
-      <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className={`h-full rounded-full ${barClass}`}
+          transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+          className={`h-full rounded-full ${colors.bar}`}
         />
       </div>
     </div>
-  );
-};
+
+    <ChevronRight
+      size={16}
+      className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+    />
+  </div>
+);
+
+const FocusRow = ({ icon: Icon, title, subtitle, value, delay, onClick }) => (
+  <motion.button
+    initial={{ opacity: 0, x: -10 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay, duration: 0.35, ease: "easeOut" }}
+    whileHover={{ scale: 1.015 }}
+    whileTap={{ scale: 0.99 }}
+    onClick={onClick}
+    className="w-full bg-white rounded-xl p-3.5 flex items-center justify-between shadow-[0_1px_4px_rgb(0,0,0,0.06)] cursor-pointer text-left"
+  >
+    <div className="flex items-center gap-3">
+      <div className="w-9 h-9 rounded-lg bg-[#74C316]/12 flex items-center justify-center shrink-0">
+        <Icon size={17} className="text-[#4a7d0d]" />
+      </div>
+      <div className="text-left">
+        <p className="text-[13.5px] font-bold text-slate-800 leading-tight">
+          {title}
+        </p>
+        <p className="text-[11.5px] text-slate-400 leading-tight mt-0.5">
+          {subtitle}
+        </p>
+      </div>
+    </div>
+
+    <div className="flex items-center gap-1">
+      <span className="text-xl font-extrabold text-[#5da011]">{value}</span>
+      <ChevronRight size={16} className="text-slate-300" />
+    </div>
+  </motion.button>
+);
 
 const BdeDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeListModal, setActiveListModal] = useState(null);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/lead/dashboard");
+      if (res.data.success) {
+        setStats(res.data.data);
+      }
+    } catch (error) {
+      toast.error("Failed to load dashboard statistics.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get("/lead/dashboard");
-        if (res.data.success) {
-          setStats(res.data.data);
-        }
-      } catch (error) {
-        toast.error("Failed to load dashboard statistics.");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Socket connection
     fetchStats();
     socket.on("lead:stats_updated", (data) => {
       setStats(data);
     });
-        return () => {
+    return () => {
       socket.off("lead:stats_updated"); // ✅ cleanup on unmount
     };
   }, []);
@@ -88,7 +176,7 @@ const BdeDashboard = () => {
   if (loading) {
     return (
       <div className="w-full h-[80vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+        <Loader2 className="w-9 h-9 text-[#74C316] animate-spin" />
         <p className="text-slate-500 font-medium animate-pulse">
           Loading dashboard...
         </p>
@@ -98,57 +186,89 @@ const BdeDashboard = () => {
 
   if (!stats) return null;
 
+  const pipelineTotal = stats.totalLeads;
+  const pct = (n) => (pipelineTotal > 0 ? Math.round((n / pipelineTotal) * 100) : 0);
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
         className="flex flex-col md:flex-row md:items-end justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-[22px] md:text-2xl font-extrabold text-slate-900 tracking-tight">
             Dashboard Overview
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Track your pipeline and daily activity metrics.
+            Track your pipeline and daily activity metrics in real time.
           </p>
         </div>
       </motion.div>
 
       {/* Main Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Total Leads"
           value={stats.totalLeads}
           icon={Users}
-          color="bg-blue-100 text-blue-600"
+          accent={{
+            bg: "bg-[#74C316]/12",
+            text: "text-[#4a7d0d]",
+            strip: "bg-[#74C316]",
+          }}
+          tagText="All time"
+          tagOk={true}
           delay={0.1}
+          onClick={() => setActiveListModal({ type: "all", title: "Total Leads" })}
         />
         <StatCard
           title="Today's Calls"
           value={stats.todayAttempted}
           icon={PhoneCall}
-          color="bg-indigo-100 text-indigo-600"
+          accent={{
+            bg: "bg-blue-50",
+            text: "text-blue-600",
+            strip: "bg-blue-500",
+          }}
+          tagText="Today"
+          tagOk={true}
           delay={0.2}
+          onClick={() => setActiveListModal({ type: "todayAttempted", title: "Today's Calls Attempted" })}
         />
         <StatCard
           title="Today's Meetings"
           value={stats.todayMeetings}
           icon={CalendarCheck}
-          color="bg-purple-100 text-purple-600"
+          accent={{
+            bg: "bg-violet-50",
+            text: "text-violet-600",
+            strip: "bg-violet-500",
+          }}
+          tagText="Scheduled"
+          tagOk={true}
           delay={0.3}
+          onClick={() => setActiveListModal({ type: "todayMeetings", title: "Today's Scheduled Meetings" })}
         />
         <StatCard
           title="Missed Follow-ups"
           value={stats.missedFollowUps}
           icon={AlertCircle}
-          color={
+          accent={
             stats.missedFollowUps > 0
-              ? "bg-red-100 text-red-600"
-              : "bg-emerald-100 text-emerald-600"
+              ? { bg: "bg-red-50", text: "text-red-600", strip: "bg-red-500" }
+              : {
+                  bg: "bg-[#74C316]/12",
+                  text: "text-[#4a7d0d]",
+                  strip: "bg-[#74C316]",
+                }
           }
+          tagText={stats.missedFollowUps > 0 ? "Needs attention" : "On track"}
+          tagOk={stats.missedFollowUps === 0}
           delay={0.4}
+          onClick={() => setActiveListModal({ type: "missed", title: "Missed Follow-ups" })}
         />
       </div>
 
@@ -157,86 +277,168 @@ const BdeDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm"
+          transition={{ delay: 0.5, duration: 0.4, ease: "easeOut" }}
+          className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/70 shadow-[0_2px_12px_rgb(0,0,0,0.03)]"
         >
-          <div className="flex items-center gap-2 mb-6">
-            <Briefcase className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-lg font-bold text-slate-800">
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-9 h-9 rounded-lg bg-[#74C316]/12 flex items-center justify-center">
+              <Briefcase className="w-[18px] h-[18px] text-[#4a7d0d]" />
+            </div>
+            <h2 className="text-[15px] font-bold text-slate-800">
               Pipeline Breakdown
             </h2>
           </div>
 
-          <div className="space-y-6">
-            <PipelineCard
-              title="Interested"
-              count={stats.pipeline.interested}
-              total={stats.totalLeads}
-              colorClass="text-amber-600"
-              barClass="bg-amber-500"
-            />
-            <PipelineCard
-              title="Not Picked"
-              count={stats.pipeline.notPicked}
-              total={stats.totalLeads}
-              colorClass="text-slate-600"
-              barClass="bg-slate-400"
-            />
-            <PipelineCard
-              title="Closed Won"
-              count={stats.pipeline.closedWon}
-              total={stats.totalLeads}
-              colorClass="text-emerald-600"
-              barClass="bg-emerald-500"
-            />
-            <PipelineCard
-              title="Rejected / Lost"
-              count={stats.pipeline.rejected}
-              total={stats.totalLeads}
-              colorClass="text-red-600"
-              barClass="bg-red-500"
-            />
-          </div>
-        </motion.div>
+          <div className="divide-y divide-slate-100">
+            <div className="py-2 first:pt-0">
+              <PipelineCard
+                title="Interested"
+                count={stats.pipeline.interested}
+                percentage={pct(stats.pipeline.interested)}
+                icon={Flame}
+                colors={{
+                  badgeBg: "bg-amber-50",
+                  badgeIcon: "text-amber-600",
+                  pillBg: "bg-amber-50",
+                  pillText: "text-amber-700",
+                  bar: "bg-amber-500",
+                }}
+                onClick={() => setActiveListModal({ type: "interested", title: "Interested Leads" })}
+              />
+            </div>
 
-        {/* Quick Action / Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
-          <div className="relative z-10">
-            <h2 className="text-lg font-bold mb-2">Today's Focus</h2>
-            <p className="text-indigo-100 text-sm mb-6">
-              Stay on top of your daily tasks to hit your target.
-            </p>
+            <div className="py-2">
+              <PipelineCard
+                title="Not Picked"
+                count={stats.pipeline.notPicked}
+                percentage={pct(stats.pipeline.notPicked)}
+                icon={PhoneMissed}
+                colors={{
+                  badgeBg: "bg-slate-100",
+                  badgeIcon: "text-slate-500",
+                  pillBg: "bg-slate-100",
+                  pillText: "text-slate-600",
+                  bar: "bg-slate-400",
+                }}
+                onClick={() => setActiveListModal({ type: "notPicked", title: "Not Picked Leads" })}
+              />
+            </div>
 
-            <div className="space-y-4">
-              <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between border border-white/10 backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <PhoneCall size={18} className="text-indigo-200" />
-                  <span className="font-medium">Follow-ups Due</span>
-                </div>
-                <span className="text-xl font-bold">
-                  {stats.todayFollowUps}
-                </span>
-              </div>
+            <div className="py-2">
+              <PipelineCard
+                title="Closed Won"
+                count={stats.pipeline.closedWon}
+                percentage={pct(stats.pipeline.closedWon)}
+                icon={CheckCircle2}
+                colors={{
+                  badgeBg: "bg-[#74C316]/12",
+                  badgeIcon: "text-[#4a7d0d]",
+                  pillBg: "bg-[#74C316]/12",
+                  pillText: "text-[#4a7d0d]",
+                  bar: "bg-[#74C316]",
+                }}
+                onClick={() => setActiveListModal({ type: "closedWon", title: "Closed Won Deals" })}
+              />
+            </div>
 
-              <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between border border-white/10 backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <Trophy size={18} className="text-amber-300" />
-                  <span className="font-medium">Total Deals Won</span>
-                </div>
-                <span className="text-xl font-bold">
-                  {stats.pipeline.closedWon}
-                </span>
-              </div>
+            <div className="py-2 last:pb-0">
+              <PipelineCard
+                title="Rejected / Lost"
+                count={stats.pipeline.rejected}
+                percentage={pct(stats.pipeline.rejected)}
+                icon={XCircle}
+                colors={{
+                  badgeBg: "bg-red-50",
+                  badgeIcon: "text-red-600",
+                  pillBg: "bg-red-50",
+                  pillText: "text-red-700",
+                  bar: "bg-red-500",
+                }}
+                onClick={() => setActiveListModal({ type: "rejected", title: "Rejected / Lost Leads" })}
+              />
             </div>
           </div>
         </motion.div>
+
+        {/* Quick Action / Summary — "Today's Focus" */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.4, ease: "easeOut" }}
+          className="bg-gradient-to-br from-[#8fd93a] via-[#5fae12] to-[#3d7a09] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden flex flex-col justify-between"
+        >
+          <div className="absolute -right-6 -bottom-6 w-32 h-32 opacity-15 pointer-events-none">
+            <Target size={128} strokeWidth={1} />
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-2.5 mb-1.5">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <Target size={16} />
+              </div>
+              <h2 className="text-[15px] font-bold">Today's Focus</h2>
+            </div>
+            <p className="text-white/85 text-[12.5px] leading-snug mb-5">
+              Stay on top of your daily tasks to hit your target.
+            </p>
+
+            <div className="space-y-2.5">
+              <FocusRow
+                icon={PhoneCall}
+                title="Follow-ups Due"
+                subtitle="Pending follow-ups"
+                value={stats.todayFollowUps}
+                delay={0.65}
+                onClick={() => setActiveListModal({ type: "todayFollowUps", title: "Today's Follow-ups Due" })}
+              />
+              <FocusRow
+                icon={Trophy}
+                title="Total Deals Won"
+                subtitle="Congratulations!"
+                value={stats.pipeline.closedWon}
+                delay={0.7}
+                onClick={() => setActiveListModal({ type: "closedWon", title: "Total Deals Won" })}
+              />
+            </div>
+          </div>
+
+          <div className="relative z-10 mt-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/bde/leads")}
+              className="w-full bg-black/15 hover:bg-black/25 backdrop-blur-sm rounded-xl py-3 flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors cursor-pointer"
+            >
+              View All Tasks
+              <ArrowRight size={15} />
+            </motion.button>
+          </div>
+        </motion.div>
       </div>
+
+      {/* Metric List Modal */}
+      {activeListModal && (
+        <MetricListModal
+          listType={activeListModal.type}
+          title={activeListModal.title}
+          onClose={() => setActiveListModal(null)}
+          onLeadSelect={(leadId) => {
+            setActiveListModal(null);
+            setSelectedLeadId(leadId);
+          }}
+        />
+      )}
+
+      {/* Lead Detail Modal */}
+      {selectedLeadId && (
+        <LeadDetailModal
+          leadId={selectedLeadId}
+          onClose={() => setSelectedLeadId(null)}
+          onUpdated={() => {
+            fetchStats();
+          }}
+        />
+      )}
     </div>
   );
 };

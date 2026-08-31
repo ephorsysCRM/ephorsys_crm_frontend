@@ -82,7 +82,7 @@ const Pagination = ({ page, totalPages, onChange }) => {
             onClick={() => onChange(p)}
             className={`w-10 h-10 text-sm rounded-xl border font-bold transition-all ${
               page === p
-                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20 scale-105"
+                ? "bg-[#74C316] text-white border-[#74C316] shadow-md shadow-[#74C316]/25 scale-105"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             }`}
           >
@@ -116,37 +116,37 @@ const ClientCard = ({ lead, onViewDetails }) => {
     .toUpperCase();
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:shadow-xl hover:border-emerald-300/80 transition-all duration-300 relative flex flex-col justify-between group overflow-hidden">
+    <div className="bg-white rounded-2xl   p-5 hover:shadow-xl hover:border-[#74C316]/40 transition-all duration-300 relative flex flex-col justify-between group overflow-hidden">
       {/* Background Decorative Glow */}
-      <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-500" />
-      
+      <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#74C316]/10 rounded-full blur-2xl pointer-events-none group-hover:bg-[#74C316]/20 transition-all duration-500" />
+
       {/* Top Banner Accent */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 rounded-t-2xl" />
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#74C316] rounded-t-2xl" />
 
       <div>
         {/* Header Row: Initials Avatar + Name & Phone + Star Badge */}
         <div className="flex items-start justify-between gap-3 pt-1">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-emerald-500/20 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+            <div className="w-12 h-12 rounded-xl bg-[#74C316] text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-[#74C316]/25 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
               {initials}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-slate-900 text-base leading-snug truncate group-hover:text-emerald-700 transition-colors">
+              <h3 className="font-bold text-slate-900 text-base leading-snug truncate group-hover:text-[#4a7d0d] transition-colors">
                 {lead.fullName}
               </h3>
               <a
                 href={`tel:${lead.mobileNumber}`}
-                className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 hover:text-indigo-600 font-semibold transition-colors w-fit"
+                className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 hover:text-[#4a7d0d] font-semibold transition-colors w-fit"
                 title="Click to Call"
               >
-                <Phone size={12} className="text-emerald-500" />
+                <Phone size={12} className="text-[#74C316]" />
                 {lead.mobileNumber}
               </a>
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-bold tracking-wide flex-shrink-0 shadow-2xs">
-            <Sparkles size={11} className="text-emerald-500 fill-emerald-200" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#74C316]/12 border border-[#74C316]/25 text-[#4a7d0d] text-[11px] font-bold tracking-wide flex-shrink-0 shadow-2xs">
+            <Sparkles size={11} className="text-[#74C316] fill-[#74C316]/30" />
             Closed Won
           </span>
         </div>
@@ -155,7 +155,7 @@ const ClientCard = ({ lead, onViewDetails }) => {
         <div className="mt-4 pt-3 border-t border-slate-100/80 space-y-2.5">
           {lead.projectType && (
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-5 h-5 rounded-md bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+              <div className="w-5 h-5 rounded-md bg-[#74C316]/12 flex items-center justify-center text-[#4a7d0d] flex-shrink-0">
                 <Briefcase size={12} />
               </div>
               <span className="font-semibold text-slate-700 truncate">
@@ -195,7 +195,7 @@ const ClientCard = ({ lead, onViewDetails }) => {
         <div className="flex items-center gap-1.5">
           <a
             href={`tel:${lead.mobileNumber}`}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 transition-colors shadow-2xs"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-[#74C316] hover:text-white text-slate-600 transition-colors shadow-2xs"
             title="Call Client"
           >
             <Phone size={14} />
@@ -205,7 +205,7 @@ const ClientCard = ({ lead, onViewDetails }) => {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 transition-colors shadow-2xs"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-[#74C316] hover:text-white text-slate-600 transition-colors shadow-2xs"
               title="Chat on WhatsApp"
             >
               <MessageCircle size={14} />
@@ -215,7 +215,7 @@ const ClientCard = ({ lead, onViewDetails }) => {
 
         <button
           onClick={() => onViewDetails(lead._id)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-xs font-bold transition-all shadow-2xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#74C316]/12 hover:bg-[#74C316] text-[#4a7d0d] hover:text-white text-xs font-bold transition-all shadow-2xs"
         >
           <Eye size={13} />
           View Details
@@ -310,7 +310,7 @@ export default function BdeHappyClients() {
       {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/25 p-3.5">
+          <div className="w-13 h-13 rounded-2xl bg-[#74C316] flex items-center justify-center shadow-lg shadow-[#74C316]/25 p-3.5">
             <Trophy size={24} className="text-white" />
           </div>
           <div>
@@ -318,7 +318,7 @@ export default function BdeHappyClients() {
             <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-2">
               <span>All your successfully closed deals</span>
               {totalCount > 0 && (
-                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
+                <span className="px-2.5 py-0.5 bg-[#74C316]/12 text-[#4a7d0d] text-xs font-bold rounded-full border border-[#74C316]/25">
                   {totalCount} Total
                 </span>
               )}
@@ -338,7 +338,7 @@ export default function BdeHappyClients() {
               value={search}
               onChange={handleSearchChange}
               placeholder="Search by name, phone number..."
-              className="w-full pl-10 pr-9 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white shadow-sm transition-all"
+              className="w-full pl-10 pr-9 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#74C316]/40 focus:border-[#74C316] bg-white shadow-sm transition-all"
             />
             {search && (
               <button
@@ -357,26 +357,26 @@ export default function BdeHappyClients() {
             title="Refresh List"
             className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm disabled:opacity-50"
           >
-            <RefreshCw size={17} className={loading ? "animate-spin text-emerald-600" : ""} />
+            <RefreshCw size={17} className={loading ? "animate-spin text-[#74C316]" : ""} />
           </button>
         </div>
       </div>
 
       {/* Search notification */}
       {search && !loading && (
-        <div className="mb-5 flex items-center justify-between bg-emerald-50/70 border border-emerald-200/80 px-4 py-2.5 rounded-xl text-sm text-emerald-900">
+        <div className="mb-5 flex items-center justify-between bg-[#74C316]/8 border border-[#74C316]/25 px-4 py-2.5 rounded-xl text-sm text-[#2c4d07]">
           <div className="flex items-center gap-2">
-            <Search size={15} className="text-emerald-600" />
+            <Search size={15} className="text-[#4a7d0d]" />
             <span>
               Search results for <strong className="font-semibold">"{search}"</strong>
-              <span className="ml-2 px-2 py-0.5 bg-emerald-200/80 text-emerald-900 text-xs font-bold rounded-md">
+              <span className="ml-2 px-2 py-0.5 bg-[#74C316]/20 text-[#2c4d07] text-xs font-bold rounded-md">
                 {totalCount} found
               </span>
             </span>
           </div>
           <button
             onClick={clearSearch}
-            className="text-emerald-700 hover:text-emerald-950 font-bold text-xs underline"
+            className="text-[#4a7d0d] hover:text-[#2c4d07] font-bold text-xs underline"
           >
             Clear Search
           </button>
@@ -386,13 +386,13 @@ export default function BdeHappyClients() {
       {/* Loading */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-3">
-          <Loader2 size={40} className="animate-spin text-emerald-600" />
+          <Loader2 size={40} className="animate-spin text-[#74C316]" />
           <p className="text-sm font-semibold text-slate-500">Searching happy clients...</p>
         </div>
       ) : filteredLeads.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-28 text-center bg-white rounded-3xl border border-slate-200/80 p-8 shadow-sm">
-          <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100">
-            <Trophy size={36} className="text-emerald-400" />
+          <div className="w-20 h-20 rounded-full bg-[#74C316]/10 flex items-center justify-center mb-4 border border-[#74C316]/20">
+            <Trophy size={36} className="text-[#8fbf4a]" />
           </div>
           <h3 className="font-bold text-slate-800 text-lg">No Happy Clients Found</h3>
           <p className="text-sm text-slate-500 mt-1 max-w-sm">
@@ -403,7 +403,7 @@ export default function BdeHappyClients() {
           {search && (
             <button
               onClick={clearSearch}
-              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm"
+              className="mt-4 px-4 py-2 bg-[#74C316] text-white rounded-xl text-xs font-bold hover:bg-[#5da011] transition-colors shadow-sm"
             >
               Reset Search Filter
             </button>

@@ -46,7 +46,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -56,8 +56,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 w-65
-          bg-gradient-to-b from-[var(--primary-700)] via-[var(--primary-800)] to-black
-          text-white flex flex-col border-r border-white/10 shadow-2xl
+          bg-[#071E0F]
+          text-white flex flex-col border-r border-[#74C316]/20 shadow-2xl
           transition-transform duration-300
           lg:relative lg:translate-x-0 lg:shrink-0
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -68,23 +68,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex items-center justify-between px-5 h-16 border-b border-white/10"
+          className="flex items-center justify-between px-5 h-20  mb-2"
         >
           <div className="flex items-center">
-            <div className="w-20 h-20 flex items-center justify-center">
+            <div className="w-16 h-16 flex items-center justify-center rounded-xl bg-white/5 mr-1">
               <img
                 src={logo}
                 alt="logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain p-1.5"
               />
             </div>
 
             <div>
-              <h2 className="text-lg font-black tracking-wide leading-tight">
+              <h2 className="text-lg font-black tracking-wide leading-tight text-white ml-1">
                 EPHORSYS
               </h2>
 
-              <p className="text-[11px] uppercase tracking-[3px] text-slate-300">
+              <p className="text-[11px] uppercase tracking-[3px] text-[#74C316] ml-1">
                 CRM PANEL
               </p>
             </div>
@@ -93,7 +93,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           {/* Close Button */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden w-9 h-9 rounded-xl hover:bg-white/10 transition flex items-center justify-center"
+            className="lg:hidden w-9 h-9 rounded-xl hover:bg-[#74C316]/15 transition flex items-center justify-center text-slate-300 hover:text-[#74C316]"
           >
             <X size={18} />
           </button>
@@ -115,13 +115,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 to={path}
                 className={({ isActive }) =>
                   `
-                  flex items-center gap-3 px-4 py-3 rounded-2xl
-                  text-sm font-medium transition-all duration-300
+                  group flex items-center gap-3 px-4 py-3 rounded-2xl
+                  text-sm font-medium transition-all duration-300 relative overflow-hidden
 
                   ${
                     isActive
-                      ? "bg-white text-[var(--primary-700)] shadow-lg"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      ? "bg-[#74C316] text-black shadow-lg shadow-[#74C316]/30"
+                      : "text-slate-300 hover:bg-[#74C316]/10 hover:text-[#74C316]"
                   }
                 `
                 }
@@ -134,7 +134,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </nav>
 
         {/* Bottom */}
-        <div className="p-4 border-t border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="p-4 border-t border-[#74C316]/20 bg-black/30 backdrop-blur-md">
           {/* Logout */}
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -142,11 +142,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             onClick={() => setLogoutOpen(true)}
             className="
               w-full flex items-center justify-center gap-3
-              py-2 rounded-2xl cursor-pointer
-              bg-[var(--primary)]
-              hover:bg-[var(--primary-500)]
+              py-2.5 rounded-2xl cursor-pointer
+              bg-[#74C316] text-black
+              hover:bg-[#8AD62E]
               transition-all duration-300
-              font-medium shadow-lg shadow-[var(--primary)]/30
+              font-semibold shadow-lg shadow-[#74C316]/30
             "
           >
             <LogOut size={18} />
