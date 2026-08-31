@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchLeads,
@@ -27,6 +27,8 @@ import {
   Eye,
   XCircle,
   MessageSquare,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // ── Enums matching backend lead.model.js ──────────────────────
@@ -47,7 +49,7 @@ const LEAD_STATUSES = [
 ];
 const CALL_STATUSES = [
   "Connected", "Not Connected", "Switch Off / Not Reachable",
-  "Blocked", "Wrong Number", "Denied", "Not Picked",
+  "Blocked", "Wrong Number", "Denied", "Not Picked", "Wrongly Inquired",
 ];
 
 const PROJECT_LABELS = {
@@ -478,7 +480,68 @@ const LeadDetailModal = ({ lead, onClose }) => {
   );
 };
 
-// ── Main Lead Page ────────────────────────────────────────────
+// ── Pagination Component ──────────────────────────────────────
+const Pagination = ({ page, totalPages, onChange }) => {
+  if (totalPages <= 1) return null;
+
+  const getPages = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages = [];
+    if (page <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    } else if (page >= totalPages - 3) {
+      pages.push(1);
+      pages.push("...");
+      for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      pages.push("...");
+      for (let i = page - 1; i <= page + 1; i++) pages.push(i);
+      pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page === 1}
+        className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+      >
+        <ChevronLeft size={15} />
+      </button>
+      {getPages().map((p, i) =>
+        p === "..." ? (
+          <span key={`ellipsis-${i}`} className="px-2 text-slate-400 text-sm select-none">…</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p)}
+            className={`w-9 h-9 text-sm rounded-lg border font-medium transition-colors ${
+              page === p
+                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            {p}
+          </button>
+        )
+      )}
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page === totalPages}
+        className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+      >
+        <ChevronRight size={15} />
+      </button>
+    </div>
+  );
+};
+
 const Lead = () => {
   const dispatch = useDispatch();
   const { leads, loading, error, successMessage, pagination } = useSelector(state => state.lead);
@@ -492,21 +555,32 @@ const Lead = () => {
   const [detailLead, setDetailLead] = useState(null);
   const [toastMsg, setToastMsg] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const LEADS_PER_PAGE = 12;
+  const searchDebounceRef = useRef(null);
+
+  // Centralised fetch — called whenever page / filters / search change
+  const doFetch = useCallback((page, searchVal, filterVals) => {
+    const params = { page, limit: LEADS_PER_PAGE };
+    if (searchVal) params.search = searchVal;
+    if (filterVals.leadStatus) params.leadStatus = filterVals.leadStatus;
+    if (filterVals.leadSource) params.leadSource = filterVals.leadSource;
+    if (filterVals.assignedTo) params.assignedTo = filterVals.assignedTo;
+    dispatch(fetchLeads(params));
+  }, [dispatch]);
 
   // Load initial data
   useEffect(() => {
     dispatch(fetchAllEmployees());
-    dispatch(fetchLeads());
-  }, [dispatch]);
+    doFetch(1, "", { leadStatus: "", leadSource: "", assignedTo: "" });
+  }, [dispatch, doFetch]);
 
-  // Re-fetch when filters change
+  // Re-fetch when filters change (reset to page 1)
   useEffect(() => {
-    const params = {};
-    if (filters.leadStatus) params.leadStatus = filters.leadStatus;
-    if (filters.leadSource) params.leadSource = filters.leadSource;
-    if (filters.assignedTo) params.assignedTo = filters.assignedTo;
-    dispatch(fetchLeads(params));
-  }, [filters, dispatch]);
+    setCurrentPage(1);
+    doFetch(1, search, filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   // Watch Redux messages
   useEffect(() => {
@@ -525,22 +599,32 @@ const Lead = () => {
     setTimeout(() => setToastMsg(null), 4000);
   };
 
-  // Client-side search filter
-  const filteredLeads = leads.filter(lead => {
-    const q = search.toLowerCase();
-    return (
-      lead.fullName?.toLowerCase().includes(q) ||
-      lead.mobileNumber?.includes(q) ||
-      lead.leadSource?.toLowerCase().includes(q)
-    );
-  });
+  // Debounced search handler
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearch(val);
+    clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      setCurrentPage(1);
+      doFetch(1, val, filters);
+    }, 350);
+  };
 
-  // Summary stats
+  // Summary stats — use pagination.total if available for accurate totals
   const stats = {
-    total: leads.length,
+    total: pagination?.total ?? leads.length,
     active: leads.filter(l => l.isActive).length,
     interested: leads.filter(l => l.leadStatus === "Interested").length,
     closedWon: leads.filter(l => l.leadStatus === "Closed Won").length,
+  };
+
+  const totalPages = pagination?.pages ?? 1;
+
+  // Page change handler
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    doFetch(newPage, search, filters);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Create lead handler
@@ -549,7 +633,7 @@ const Lead = () => {
     try {
       await dispatch(createLead(formData)).unwrap();
       setShowCreateModal(false);
-      dispatch(fetchLeads()); // refresh list
+      doFetch(currentPage, search, filters); // refresh current page
     } catch (err) {
       showToast(err?.message || "Failed to create lead", "error");
     } finally {
@@ -563,7 +647,7 @@ const Lead = () => {
     try {
       await dispatch(updateLeadCallStatus({ id: leadId, data })).unwrap();
       setCallLead(null);
-      dispatch(fetchLeads()); // refresh list
+      doFetch(currentPage, search, filters); // refresh current page
     } catch (err) {
       showToast(err?.message || "Failed to log call", "error");
     } finally {
@@ -572,6 +656,8 @@ const Lead = () => {
   };
 
   const clearFilters = () => setFilters({ leadStatus: "", leadSource: "", assignedTo: "" });
+
+  const handleRefresh = () => doFetch(currentPage, search, filters);
 
   return (
     <div className="p-6 md:p-8 bg-slate-50 min-h-screen">
@@ -616,7 +702,7 @@ const Lead = () => {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => dispatch(fetchLeads())}
+            onClick={handleRefresh}
             className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
             title="Refresh"
           >
@@ -656,9 +742,9 @@ const Lead = () => {
             <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by name, mobile, source..."
+              placeholder="Search by name or phone number..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400"
             />
           </div>
@@ -724,7 +810,7 @@ const Lead = () => {
           <Loader2 size={36} className="animate-spin text-indigo-600" />
           <p className="text-sm text-slate-500">Loading leads...</p>
         </div>
-      ) : filteredLeads.length === 0 ? (
+      ) : leads.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <MessageSquare size={48} className="text-slate-300 mb-3" />
           <h3 className="font-semibold text-slate-700">No leads found</h3>
@@ -744,7 +830,7 @@ const Lead = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {filteredLeads.map(lead => (
+          {leads.map(lead => (
             <LeadCard
               key={lead._id}
               lead={lead}
@@ -755,11 +841,18 @@ const Lead = () => {
         </div>
       )}
 
-      {/* Count */}
-      {!loading && filteredLeads.length > 0 && (
-        <p className="text-center text-xs text-slate-400 mt-8">
-          Showing {filteredLeads.length} of {leads.length} leads
-        </p>
+      {/* Pagination */}
+      {!loading && leads.length > 0 && (
+        <>
+          <Pagination
+            page={currentPage}
+            totalPages={totalPages}
+            onChange={handlePageChange}
+          />
+          <p className="text-center text-xs text-slate-400 mt-3">
+            Page {currentPage} of {totalPages} · {pagination?.total ?? leads.length} total leads
+          </p>
+        </>
       )}
     </div>
   );

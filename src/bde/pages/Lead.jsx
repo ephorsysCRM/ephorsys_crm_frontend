@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Users,
   Flame,
@@ -10,8 +10,11 @@ import {
   XCircle,
   PhoneCall,
   AlertCircle,
-  Trophy,
+  Handshake,
   ListTodo,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
@@ -29,13 +32,11 @@ export default function Lead() {
   const [activePipelineStage, setActivePipelineStage] = useState("Interested");
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
-  //pagination
-  const leadsPerPage = 8;
-  const totalPages = Math.ceil(leads.length / leadsPerPage);
-
-  const startIndex = (currentPage - 1) * leadsPerPage;
-  const currentLeads = leads.slice(startIndex, startIndex + leadsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalLeadsCount, setTotalLeadsCount] = useState(0);
+  const [search, setSearch] = useState("");
+  const searchDebounceRef = useRef(null);
+  const LEADS_PER_PAGE = 10;
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -94,6 +95,7 @@ export default function Lead() {
     "Wrong Number",
     "Denied",
     "Not Picked",
+    "Wrongly Inquired",
   ];
 
   const NOT_PICKED_STATUSES = [
@@ -109,7 +111,7 @@ export default function Lead() {
       .join(" ");
   };
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1, searchVal = "") => {
     setLoading(true);
     try {
       // Always fetch stats to update the ribbon
@@ -119,8 +121,12 @@ export default function Lead() {
       }
 
       if (activeTab === "all") {
-        const res = await api.get("/lead/get-leads");
+        const params = new URLSearchParams({ page, limit: LEADS_PER_PAGE });
+        if (searchVal) params.set("search", searchVal);
+        const res = await api.get(`/lead/get-leads?${params.toString()}`);
         setLeads(res.data.data);
+        setTotalPages(res.data.pages ?? 1);
+        setTotalLeadsCount(res.data.total ?? 0);
       } else if (activeTab === "pipeline") {
         const res = await api.get("/lead/pipeline");
         setPipeline(res.data.data);
@@ -136,8 +142,10 @@ export default function Lead() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchData();
+    setCurrentPage(1);
+    setSearch("");
+    fetchData(1, "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   useEffect(() => {
@@ -145,14 +153,12 @@ export default function Lead() {
 
     // New listener for follow‑up list updates
     socket.on("lead:follow_ups_updated", (data) => {
-      // Assuming the payload contains the refreshed hotlist array
       if (Array.isArray(data)) {
         setHotlist(data);
       } else if (data.hotlist) {
         setHotlist(data.hotlist);
       } else {
-        // fallback – re‑fetch from API to stay in sync
-        fetchData();
+        fetchData(currentPage, search);
       }
     });
 
@@ -160,6 +166,7 @@ export default function Lead() {
       socket.off("lead:stats_updated");
       socket.off("lead:follow_ups_updated");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateSubmit = async (e) => {
@@ -210,7 +217,7 @@ export default function Lead() {
           followUpDate: "",
           followUpTime: "",
         });
-        fetchData();
+        fetchData(currentPage, search);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create lead");
@@ -314,19 +321,19 @@ export default function Lead() {
           </div>
           <div
             onClick={() =>
-              setActiveListModal({ type: "closedWon", title: "Happy Clients" })
+              setActiveListModal({ type: "todayMeetings", title: "Today's Meetings" })
             }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-emerald-300 hover:shadow-md transition-all"
+            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all"
           >
-            <div className="bg-emerald-100 p-2.5 rounded-lg text-emerald-600">
-              <Trophy size={20} />
+            <div className="bg-purple-100 p-2.5 rounded-lg text-purple-600">
+              <Handshake size={20} />
             </div>
             <div>
               <p className="text-xs text-slate-500 font-medium uppercase">
-                Happy Clients
+                Today's Meetings
               </p>
               <h3 className="text-xl font-bold text-slate-800">
-                {stats.pipeline.closedWon}
+                {stats.todayMeetings}
               </h3>
             </div>
           </div>
@@ -365,10 +372,43 @@ export default function Lead() {
             </span>
           </div>
         ) : null}
-
         {/* Tab 1: All Leads Table */}
        {activeTab === "all" && (
   <div className="h-full flex flex-col">
+    {/* Search Bar */}
+    <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/50">
+      <div className="relative max-w-md">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearch(val);
+            clearTimeout(searchDebounceRef.current);
+            searchDebounceRef.current = setTimeout(() => {
+              setCurrentPage(1);
+              fetchData(1, val);
+            }, 350);
+          }}
+          placeholder="Search by name or phone number..."
+          className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+        />
+        {search && (
+          <button
+            onClick={() => {
+              setSearch("");
+              setCurrentPage(1);
+              fetchData(1, "");
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            <XCircle size={15} />
+          </button>
+        )}
+      </div>
+    </div>
+
     <table className="w-full text-left border-collapse">
       <thead>
         <tr className="bg-slate-50 border-b border-slate-200">
@@ -391,14 +431,14 @@ export default function Lead() {
       </thead>
 
       <tbody className="divide-y divide-slate-100">
-        {currentLeads.length === 0 ? (
+        {leads.length === 0 ? (
           <tr>
             <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-              No leads found.
+              {search ? `No leads found for "${search}".` : "No leads found."}
             </td>
           </tr>
         ) : (
-          currentLeads.map((lead) => (
+          leads.map((lead) => (
             <motion.tr
               key={lead._id}
               initial={{ opacity: 0 }}
@@ -433,7 +473,7 @@ export default function Lead() {
                   onClick={() => setSelectedLeadId(lead._id)}
                   className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                 >
-                  View & Update
+                  View &amp; Update
                 </button>
               </td>
             </motion.tr>
@@ -442,47 +482,82 @@ export default function Lead() {
       </tbody>
     </table>
 
-    {totalPages > 1 && (
-      <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white mt-auto">
+    {/* Pagination footer */}
+    {totalPages >= 1 && leads.length > 0 && (
+      <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white mt-auto flex-wrap gap-3">
         <p className="text-sm text-slate-500">
-          Showing {startIndex + 1} to{" "}
-          {Math.min(startIndex + leadsPerPage, leads.length)} of{" "}
-          {leads.length} leads
+          {totalLeadsCount > 0
+            ? `Showing ${(currentPage - 1) * LEADS_PER_PAGE + 1}–${Math.min(currentPage * LEADS_PER_PAGE, totalLeadsCount)} of ${totalLeadsCount} leads`
+            : `${leads.length} leads`}
         </p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              const p = currentPage - 1;
+              setCurrentPage(p);
+              fetchData(p, search);
+            }}
+            className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
           >
-            Prev
+            <ChevronLeft size={15} />
           </button>
 
-          {Array.from({ length: totalPages }).map((_, index) => {
-            const page = index + 1;
+          {(() => {
+            const getPages = () => {
+              if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+              const pages = [];
+              if (currentPage <= 4) {
+                for (let i = 1; i <= 5; i++) pages.push(i);
+                pages.push("...");
+                pages.push(totalPages);
+              } else if (currentPage >= totalPages - 3) {
+                pages.push(1);
+                pages.push("...");
+                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+              } else {
+                pages.push(1);
+                pages.push("...");
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+                pages.push("...");
+                pages.push(totalPages);
+              }
+              return pages;
+            };
 
-            return (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 text-sm rounded-lg border ${
-                  currentPage === page
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "bg-white text-slate-600 border-slate-200"
-                }`}
-              >
-                {page}
-              </button>
+            return getPages().map((p, i) =>
+              p === "..." ? (
+                <span key={`e-${i}`} className="px-1 text-slate-400 text-sm select-none">…</span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => {
+                    setCurrentPage(p);
+                    fetchData(p, search);
+                  }}
+                  className={`w-9 h-9 text-sm rounded-lg border font-medium transition-colors ${
+                    currentPage === p
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {p}
+                </button>
+              )
             );
-          })}
+          })()}
 
           <button
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              const p = currentPage + 1;
+              setCurrentPage(p);
+              fetchData(p, search);
+            }}
+            className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
           >
-            Next
+            <ChevronRight size={15} />
           </button>
         </div>
       </div>

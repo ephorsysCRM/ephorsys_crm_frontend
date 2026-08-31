@@ -9,7 +9,7 @@ import api from "../../services/api";
 
 const CALL_STATUSES = [
   "Connected", "Not Connected", "Switch Off / Not Reachable", 
-  "Blocked", "Wrong Number", "Denied", "Not Picked"
+  "Blocked", "Wrong Number", "Denied", "Not Picked", "Wrongly Inquired"
 ];
 
 const NOT_PICKED_STATUSES = [

@@ -5,6 +5,7 @@ import {
   Users,
   BriefcaseBusiness,
   BarChart3,
+  Trophy,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +24,11 @@ const NAV_ITEMS = [
     path: "/bde/leads",
     label: "Leads",
     icon: Users,
+  },
+  {
+    path: "/bde/happy-clients",
+    label: "Happy Clients",
+    icon: Trophy,
   },
 ];
 
