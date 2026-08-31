@@ -618,6 +618,22 @@ const Lead = () => {
     closedWon: leads.filter(l => l.leadStatus === "Closed Won").length,
   };
 
+  const filteredLeads = leads.filter((lead) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase().trim();
+    const cleanQ = q.replace(/\D/g, "");
+    const cleanMobile = (lead.mobileNumber || "").replace(/\D/g, "");
+
+    return (
+      lead.fullName?.toLowerCase().includes(q) ||
+      lead.mobileNumber?.includes(q) ||
+      (cleanQ.length >= 3 && cleanMobile.includes(cleanQ)) ||
+      lead.leadSource?.toLowerCase().includes(q) ||
+      lead.projectType?.toLowerCase().includes(q) ||
+      `${lead.assignedTo?.firstName || ""} ${lead.assignedTo?.lastName || ""}`.toLowerCase().includes(q)
+    );
+  });
+
   const totalPages = pagination?.pages ?? 1;
 
   // Page change handler
@@ -810,7 +826,7 @@ const Lead = () => {
           <Loader2 size={36} className="animate-spin text-indigo-600" />
           <p className="text-sm text-slate-500">Loading leads...</p>
         </div>
-      ) : leads.length === 0 ? (
+      ) : filteredLeads.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <MessageSquare size={48} className="text-slate-300 mb-3" />
           <h3 className="font-semibold text-slate-700">No leads found</h3>
@@ -830,7 +846,7 @@ const Lead = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {leads.map(lead => (
+          {filteredLeads.map(lead => (
             <LeadCard
               key={lead._id}
               lead={lead}

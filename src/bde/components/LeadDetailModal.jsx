@@ -87,9 +87,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.patch(`/lead/${leadId}/update-lead`, payload);
       if (res.data.success) {
         toast.success("Call logged successfully!");
-        fetchLead();
         onRefresh();
-        setCallData(prev => ({...prev, remarks: "", followUpDate: "", followUpTime: ""}));
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to log call.");
@@ -105,9 +104,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.post(`/lead/${leadId}/meeting`, meetingData);
       if (res.data.success) {
         toast.success("Meeting scheduled successfully!");
-        fetchLead();
         onRefresh();
-        setMeetingData({ meetingDate: "", meetingTime: "", type: "Online", address: "", meetingLink: "", remarks: "" });
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to schedule meeting.");
@@ -123,8 +121,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.patch(`/lead/${leadId}/close`, closeData);
       if (res.data.success) {
         toast.success(`Lead marked as ${closeData.outcome}!`);
-        fetchLead();
         onRefresh();
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to close lead.");

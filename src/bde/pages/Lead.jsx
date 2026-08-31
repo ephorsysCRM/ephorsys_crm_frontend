@@ -111,6 +111,21 @@ export default function Lead() {
       .join(" ");
   };
 
+  const filteredLeads = leads.filter((lead) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase().trim();
+    const cleanQ = q.replace(/\D/g, "");
+    const cleanMobile = (lead.mobileNumber || "").replace(/\D/g, "");
+
+    return (
+      lead.fullName?.toLowerCase().includes(q) ||
+      lead.mobileNumber?.includes(q) ||
+      (cleanQ.length >= 3 && cleanMobile.includes(cleanQ)) ||
+      lead.leadSource?.toLowerCase().includes(q) ||
+      lead.projectType?.toLowerCase().includes(q)
+    );
+  });
+
   const fetchData = async (page = 1, searchVal = "") => {
     setLoading(true);
     try {
@@ -301,6 +316,24 @@ export default function Lead() {
           </div>
           <div
             onClick={() =>
+              setActiveListModal({ type: "todayMeetings", title: "Today's Meetings" })
+            }
+            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="bg-purple-100 p-2.5 rounded-lg text-purple-600">
+              <Handshake size={20} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium uppercase">
+                Today's Meetings
+              </p>
+              <h3 className="text-xl font-bold text-slate-800">
+                {stats.todayMeetings}
+              </h3>
+            </div>
+          </div>
+          <div
+            onClick={() =>
               setActiveListModal({ type: "missed", title: "Missed Follow-ups" })
             }
             className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-red-300 hover:shadow-md transition-all"
@@ -316,24 +349,6 @@ export default function Lead() {
               </p>
               <h3 className="text-xl font-bold text-slate-800">
                 {stats.missedFollowUps}
-              </h3>
-            </div>
-          </div>
-          <div
-            onClick={() =>
-              setActiveListModal({ type: "todayMeetings", title: "Today's Meetings" })
-            }
-            className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 cursor-pointer hover:border-purple-300 hover:shadow-md transition-all"
-          >
-            <div className="bg-purple-100 p-2.5 rounded-lg text-purple-600">
-              <Handshake size={20} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium uppercase">
-                Today's Meetings
-              </p>
-              <h3 className="text-xl font-bold text-slate-800">
-                {stats.todayMeetings}
               </h3>
             </div>
           </div>
@@ -431,14 +446,14 @@ export default function Lead() {
       </thead>
 
       <tbody className="divide-y divide-slate-100">
-        {leads.length === 0 ? (
+        {filteredLeads.length === 0 ? (
           <tr>
             <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
               {search ? `No leads found for "${search}".` : "No leads found."}
             </td>
           </tr>
         ) : (
-          leads.map((lead) => (
+          filteredLeads.map((lead) => (
             <motion.tr
               key={lead._id}
               initial={{ opacity: 0 }}

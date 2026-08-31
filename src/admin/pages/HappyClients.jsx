@@ -12,10 +12,15 @@ import {
   Star,
   User,
   RefreshCw,
+  MessageCircle,
+  Eye,
+  Briefcase,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 import api from "../../services/api";
+import LeadDetailModal from "../../bde/components/LeadDetailModal";
 
-// ── Constants ──────────────────────────────────────────────────
 const PROJECT_LABELS = {
   website_development: "Website Development",
   web_app_development: "Web App Development",
@@ -37,7 +42,7 @@ const PROJECT_LABELS = {
 
 const LEADS_PER_PAGE = 12;
 
-// ── Smart paginator ─────────────────────────────────────────────
+// ── Smart Paginator ─────────────────────────────────────────────
 const Pagination = ({ page, totalPages, onChange }) => {
   if (totalPages <= 1) return null;
 
@@ -63,13 +68,13 @@ const Pagination = ({ page, totalPages, onChange }) => {
   };
 
   return (
-    <div className="flex items-center justify-center gap-1.5 mt-8">
+    <div className="flex items-center justify-center gap-2 mt-10">
       <button
         onClick={() => onChange(page - 1)}
         disabled={page === 1}
-        className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+        className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors shadow-sm"
       >
-        <ChevronLeft size={15} />
+        <ChevronLeft size={16} />
       </button>
       {getPages().map((p, i) =>
         p === "..." ? (
@@ -78,9 +83,9 @@ const Pagination = ({ page, totalPages, onChange }) => {
           <button
             key={p}
             onClick={() => onChange(p)}
-            className={`w-9 h-9 text-sm rounded-lg border font-medium transition-colors ${
+            className={`w-10 h-10 text-sm rounded-xl border font-bold transition-all ${
               page === p
-                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20 scale-105"
                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             }`}
           >
@@ -91,82 +96,148 @@ const Pagination = ({ page, totalPages, onChange }) => {
       <button
         onClick={() => onChange(page + 1)}
         disabled={page === totalPages}
-        className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+        className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors shadow-sm"
       >
-        <ChevronRight size={15} />
+        <ChevronRight size={16} />
       </button>
     </div>
   );
 };
 
-// ── Client Card ─────────────────────────────────────────────────
-const ClientCard = ({ lead }) => {
+// ── Ultra-Premium Client Card ────────────────────────────────────
+const ClientCard = ({ lead, onViewDetails }) => {
   const assignee = lead.assignedTo;
   const assigneeName = assignee
     ? `${assignee.firstName || ""} ${assignee.lastName || ""}`.trim()
     : "Unassigned";
 
+  // Clean phone number for whatsapp
+  const cleanPhone = (lead.mobileNumber || "").replace(/\D/g, "");
+  const whatsappUrl = cleanPhone
+    ? `https://wa.me/${cleanPhone.length === 10 ? "91" + cleanPhone : cleanPhone}`
+    : "#";
+
+  // Get Initials for Avatar
+  const initials = (lead.fullName || "C")
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-lg hover:border-emerald-300 transition-all duration-200 relative overflow-hidden group">
-      {/* Top accent gradient */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-t-2xl" />
+    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:shadow-xl hover:border-emerald-300/80 transition-all duration-300 relative flex flex-col justify-between group overflow-hidden">
+      {/* Background Decorative Glow */}
+      <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-500" />
+      
+      {/* Top Banner Accent */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 rounded-t-2xl" />
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mt-1">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-slate-900 text-[15px] leading-snug truncate">
-            {lead.fullName}
-          </h3>
-          <a
-            href={`tel:${lead.mobileNumber}`}
-            className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 hover:text-indigo-600 transition-colors w-fit"
-          >
-            <Phone size={11} className="text-slate-400" />
-            {lead.mobileNumber}
-          </a>
-        </div>
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-          <Star size={18} className="text-emerald-500 fill-emerald-200" />
-        </div>
-      </div>
+      <div>
+        {/* Header Row: Initials Avatar + Name & Phone + Star Badge */}
+        <div className="flex items-start justify-between gap-3 pt-1">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-emerald-500/20 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              {initials}
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-slate-900 text-base leading-snug truncate group-hover:text-emerald-700 transition-colors">
+                {lead.fullName}
+              </h3>
+              <a
+                href={`tel:${lead.mobileNumber}`}
+                className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 hover:text-indigo-600 font-semibold transition-colors w-fit"
+                title="Click to Call"
+              >
+                <Phone size={12} className="text-emerald-500" />
+                {lead.mobileNumber}
+              </a>
+            </div>
+          </div>
 
-      {/* Details */}
-      <div className="mt-4 space-y-2.5">
-        {lead.projectType && (
-          <div className="flex items-center gap-2 text-xs text-slate-700">
-            <TrendingUp size={12} className="text-emerald-500 flex-shrink-0" />
-            <span className="truncate font-medium">
-              {PROJECT_LABELS[lead.projectType] || lead.projectType}
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-bold tracking-wide flex-shrink-0 shadow-2xs">
+            <Sparkles size={11} className="text-emerald-500 fill-emerald-200" />
+            Closed Won
+          </span>
+        </div>
+
+        {/* Information Grid */}
+        <div className="mt-4 pt-3 border-t border-slate-100/80 space-y-2.5">
+          {lead.projectType && (
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-5 h-5 rounded-md bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                <Briefcase size={12} />
+              </div>
+              <span className="font-semibold text-slate-700 truncate">
+                {PROJECT_LABELS[lead.projectType] || lead.projectType}
+              </span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 text-xs text-slate-600">
+            <div className="w-5 h-5 rounded-md bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
+              <User size={12} />
+            </div>
+            <span className="text-slate-500">Assigned:</span>
+            <span className="font-semibold text-slate-800 truncate">{assigneeName}</span>
+          </div>
+
+          {lead.leadSource && (
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <div className="w-5 h-5 rounded-md bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <Layers size={12} />
+              </div>
+              <span className="text-slate-500">Source:</span>
+              <span className="font-medium text-slate-700">{lead.leadSource}</span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+              <Calendar size={12} />
+            </div>
+            <span>Closed Date:</span>
+            <span className="font-medium text-slate-700">
+              {new Date(lead.updatedAt).toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
             </span>
           </div>
-        )}
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <User size={11} className="text-indigo-400 flex-shrink-0" />
-          <span className="truncate">{assigneeName}</span>
-        </div>
-        {lead.leadSource && (
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-indigo-200 flex-shrink-0" />
-            {lead.leadSource}
-          </div>
-        )}
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Calendar size={11} className="flex-shrink-0" />
-          Closed:{" "}
-          {new Date(lead.updatedAt).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
         </div>
       </div>
 
-      {/* Footer badge */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold uppercase tracking-wide">
-          <Trophy size={10} />
-          Closed Won
-        </span>
+      {/* Action Footer */}
+      <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <a
+            href={`tel:${lead.mobileNumber}`}
+            className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 transition-colors shadow-2xs"
+            title="Call Client"
+          >
+            <Phone size={14} />
+          </a>
+          {cleanPhone && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 transition-colors shadow-2xs"
+              title="Chat on WhatsApp"
+            >
+              <MessageCircle size={14} />
+            </a>
+          )}
+        </div>
+
+        <button
+          onClick={() => onViewDetails(lead._id)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-xs font-bold transition-all shadow-2xs"
+        >
+          <Eye size={13} />
+          View Details
+        </button>
       </div>
     </div>
   );
@@ -181,9 +252,10 @@ export default function AdminHappyClients() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [fetchError, setFetchError] = useState(null);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
   const searchDebounceRef = useRef(null);
 
-  // Centralised fetch — useCallback so it's stable
+  // Centralised fetch
   const fetchClients = useCallback(async (page, searchVal) => {
     setLoading(true);
     setFetchError(null);
@@ -228,7 +300,7 @@ export default function AdminHappyClients() {
     searchDebounceRef.current = setTimeout(() => {
       setCurrentPage(1);
       fetchClients(1, val);
-    }, 400);
+    }, 300);
   };
 
   const clearSearch = () => {
@@ -241,81 +313,103 @@ export default function AdminHappyClients() {
     fetchClients(currentPage, search);
   };
 
+  // Client-side fallback filter for instant feedback while typing
+  const filteredLeads = leads.filter((lead) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase().trim();
+    const cleanQ = q.replace(/\D/g, "");
+    const cleanMobile = (lead.mobileNumber || "").replace(/\D/g, "");
+    
+    return (
+      lead.fullName?.toLowerCase().includes(q) ||
+      lead.mobileNumber?.includes(q) ||
+      (cleanQ && cleanMobile.includes(cleanQ)) ||
+      lead.leadSource?.toLowerCase().includes(q) ||
+      lead.projectType?.toLowerCase().includes(q) ||
+      `${lead.assignedTo?.firstName || ""} ${lead.assignedTo?.lastName || ""}`.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="p-6 md:p-8 bg-slate-50 min-h-screen">
+    <div className="p-6 md:p-8 bg-slate-50/60 min-h-screen">
 
       {/* ── Page Header ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-13 h-13 w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-200/60">
-            <Trophy size={22} className="text-white" />
+          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/25 p-3.5">
+            <Trophy size={24} className="text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Happy Clients</h1>
-            <p className="text-sm text-slate-500 mt-0.5">
-              All successfully closed deals across the team
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Happy Clients</h1>
+            <p className="text-sm text-slate-500 mt-0.5 flex items-center gap-2">
+              <span>All successfully converted deals across the company</span>
               {totalCount > 0 && (
-                <span className="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                  {totalCount} clients
+                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
+                  {totalCount} Total
                 </span>
               )}
             </p>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-72">
+        {/* Controls: Search + Refresh */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-80">
             <Search
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={17}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
               type="text"
               value={search}
               onChange={handleSearchChange}
-              placeholder="Search by name or phone..."
-              className="w-full pl-9 pr-9 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent bg-white shadow-sm transition-shadow"
+              placeholder="Search by name, phone number..."
+              className="w-full pl-10 pr-9 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white shadow-sm transition-all"
             />
             {search && (
               <button
                 onClick={clearSearch}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                title="Clear Search"
               >
-                <XCircle size={15} />
+                <XCircle size={16} />
               </button>
             )}
           </div>
+
           <button
             onClick={handleRefresh}
             disabled={loading}
-            title="Refresh"
-            className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors shadow-sm disabled:opacity-50"
+            title="Refresh List"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm disabled:opacity-50"
           >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <RefreshCw size={17} className={loading ? "animate-spin text-emerald-600" : ""} />
           </button>
         </div>
       </div>
 
-      {/* Search active indicator */}
+      {/* Search status notification */}
       {search && !loading && (
-        <div className="mb-4 flex items-center gap-2 text-sm text-slate-500">
-          <Search size={14} />
-          <span>
-            {totalCount > 0
-              ? `${totalCount} result${totalCount !== 1 ? "s" : ""} for "${search}"`
-              : `No results for "${search}"`}
-          </span>
+        <div className="mb-5 flex items-center justify-between bg-emerald-50/70 border border-emerald-200/80 px-4 py-2.5 rounded-xl text-sm text-emerald-900">
+          <div className="flex items-center gap-2">
+            <Search size={15} className="text-emerald-600" />
+            <span>
+              Search results for <strong className="font-semibold">"{search}"</strong>
+              <span className="ml-2 px-2 py-0.5 bg-emerald-200/80 text-emerald-900 text-xs font-bold rounded-md">
+                {totalCount} found
+              </span>
+            </span>
+          </div>
           <button
             onClick={clearSearch}
-            className="text-indigo-600 hover:underline text-xs ml-1 font-medium"
+            className="text-emerald-700 hover:text-emerald-950 font-bold text-xs underline"
           >
-            Clear
+            Clear Search
           </button>
         </div>
       )}
 
-      {/* ── Error ── */}
+      {/* ── Error Notification ── */}
       {fetchError && (
         <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex items-center gap-2">
           <XCircle size={16} className="flex-shrink-0" />
@@ -323,43 +417,43 @@ export default function AdminHappyClients() {
         </div>
       )}
 
-      {/* ── Loading State ── */}
+      {/* ── Loading Spinner ── */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-3">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full border-4 border-emerald-100 border-t-emerald-500 animate-spin" />
-          </div>
-          <p className="text-sm text-slate-500 font-medium">Loading happy clients...</p>
+          <Loader2 size={40} className="animate-spin text-emerald-600" />
+          <p className="text-sm font-semibold text-slate-500">Searching happy clients...</p>
         </div>
-
-      ) : leads.length === 0 ? (
+      ) : filteredLeads.length === 0 ? (
         /* ── Empty State ── */
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-5 shadow-inner">
-            <Trophy size={36} className="text-emerald-300" />
+        <div className="flex flex-col items-center justify-center py-28 text-center bg-white rounded-3xl border border-slate-200/80 p-8 shadow-sm">
+          <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100">
+            <Trophy size={36} className="text-emerald-400" />
           </div>
-          <h3 className="font-bold text-slate-700 text-lg">No happy clients found</h3>
-          <p className="text-sm text-slate-400 mt-2 max-w-xs">
+          <h3 className="font-bold text-slate-800 text-lg">No Happy Clients Found</h3>
+          <p className="text-sm text-slate-500 mt-1 max-w-sm">
             {search
-              ? `No results match "${search}". Try a different name or phone number.`
-              : "Closed Won leads will appear here."}
+              ? `No client matched your search "${search}". Check phone number or name.`
+              : "Closed Won leads will appear here automatically."}
           </p>
           {search && (
             <button
               onClick={clearSearch}
-              className="mt-5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm"
             >
-              Clear Search
+              Reset Search Filter
             </button>
           )}
         </div>
-
       ) : (
-        /* ── Grid ── */
+        /* ── Client Cards Grid ── */
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-            {leads.map((lead) => (
-              <ClientCard key={lead._id} lead={lead} />
+            {filteredLeads.map((lead) => (
+              <ClientCard
+                key={lead._id}
+                lead={lead}
+                onViewDetails={(id) => setSelectedLeadId(id)}
+              />
             ))}
           </div>
 
@@ -369,10 +463,19 @@ export default function AdminHappyClients() {
             totalPages={totalPages}
             onChange={handlePageChange}
           />
-          <p className="text-center text-xs text-slate-400 mt-3">
-            Showing page {currentPage} of {totalPages} · {totalCount} total happy clients
+          <p className="text-center text-xs text-slate-400 mt-4">
+            Showing Page {currentPage} of {totalPages} · Total {totalCount} Happy Clients
           </p>
         </>
+      )}
+
+      {/* Lead Detail Modal */}
+      {selectedLeadId && (
+        <LeadDetailModal
+          leadId={selectedLeadId}
+          onClose={() => setSelectedLeadId(null)}
+          onRefresh={() => fetchClients(currentPage, search)}
+        />
       )}
     </div>
   );
