@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: import.meta.env.DEV
     ? "/api/v1"
     : "https://ephorsys-crm-backend.onrender.com/api/v1",
+    // : "http://localhost:8800/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

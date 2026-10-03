@@ -14,9 +14,11 @@ import {
   Loader2,
   Phone,
   MapPin,
-  Building2,
   BadgeCheck,
   AlertCircle,
+  KeyRound,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import api from "../../services/api";
 import { useDispatch, useSelector } from "react-redux";
@@ -109,12 +111,136 @@ const Section = ({ icon: Icon, title, children }) => (
   </div>
 );
 
+// ─── Password Reset Section ──────────────────────────────────────────────────
+const PasswordResetSection = ({ employeeId, showToast }) => {
+  const dispatch = useDispatch();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    if (!newPassword || !confirmPassword) {
+      showToast("Both fields are required", "error");
+      return;
+    }
+    if (/\s/.test(newPassword)) {
+      showToast("Password must not contain spaces", "error");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast("Passwords do not match", "error");
+      return;
+    }
+    if (newPassword.length < 6) {
+      showToast("Password must be at least 6 characters", "error");
+      return;
+    }
+    setSaving(true);
+    try {
+      await dispatch(
+        updateEmployee({ id: employeeId, data: { newPassword, confirmPassword } })
+      ).unwrap();
+      showToast("Password updated successfully");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      showToast(err?.message || "Failed to update password", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-amber-50">
+        <div className="p-2 bg-amber-100 rounded-lg">
+          <KeyRound size={16} className="text-amber-600" />
+        </div>
+        <h2 className="font-semibold text-slate-800 text-sm">Reset Employee Password</h2>
+        <span className="ml-auto text-xs text-slate-400 italic">Admin override — no old password required</span>
+      </div>
+      <form onSubmit={handleReset} className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* New Password */}
+          <div>
+            <label className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1 block">
+              New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showNew ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value.replace(/\s/g, ""))}
+                placeholder="Enter new password (no spaces)"
+                autoComplete="new-password"
+                className="w-full px-3 py-2.5 pr-10 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1 block">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value.replace(/\s/g, ""))}
+                placeholder="Confirm new password (no spaces)"
+                autoComplete="new-password"
+                className="w-full px-3 py-2.5 pr-10 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mismatch hint */}
+        {confirmPassword && newPassword !== confirmPassword && (
+          <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+            <AlertCircle size={12} /> Passwords do not match
+          </p>
+        )}
+
+        <div className="mt-5 flex justify-end">
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition shadow-sm"
+          >
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <KeyRound size={15} />}
+            {saving ? "Updating…" : "Update Password"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
 // ─── Main page ───────────────────────────────────────────────────────────────
 const EmployeeDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const { currentEmployee: employee, loading } = useSelector((state) => state.employee);
   const [toast, setToast] = useState(null);
 
@@ -134,11 +260,9 @@ const EmployeeDetailPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Generic save handler — customize endpoints as needed
   const handleSave = async (section, field, value) => {
     try {
       await dispatch(updateEmployee({ id, data: { [section]: { [field]: value } } })).unwrap();
-      // Re-fetch to sync Redux state with backend
       await dispatch(fetchEmployeeById(id)).unwrap();
       showToast("Field updated successfully");
     } catch (err) {
@@ -148,18 +272,15 @@ const EmployeeDetailPage = () => {
   };
 
   const makeHandler = (section) => (field, value) => handleSave(section, field, value);
-  const rootHandler = makeHandler("root"); // for top-level fields
+  const rootHandler = makeHandler("root");
 
   const handleViewDocument = async (doc) => {
     if (doc.fileUrl) {
       window.open(doc.fileUrl, "_blank");
       return;
     }
-    
     try {
-      const res = await api.get(`/employee/document/${doc._id}`, {
-        responseType: "blob",
-      });
+      const res = await api.get(`/employee/document/${doc._id}`, { responseType: "blob" });
       const fileBlob = new Blob([res.data], { type: doc.mimeType || "application/pdf" });
       const objectUrl = window.URL.createObjectURL(fileBlob);
       window.open(objectUrl, "_blank");
@@ -336,7 +457,7 @@ const EmployeeDetailPage = () => {
         {/* Job Information */}
         <Section icon={Briefcase} title="Job Information">
           <EditableField label="Department" value={job.department} name="department"
-          options={["Software Development", "Human Resources", "Sales", "Marketing", "Others", "Business Development Executive", "UI / UX Designer"]}
+            options={["Software Development", "Human Resources", "Sales", "Marketing", "Others", "Business Development Executive", "UI / UX Designer"]}
             onSave={(n, v) => handleSave("jobInformation", n, v)} />
           <EditableField label="Designation" value={job.designation} name="designation"
             onSave={(n, v) => handleSave("jobInformation", n, v)} />
@@ -402,6 +523,9 @@ const EmployeeDetailPage = () => {
           <EditableField label="Reason for Leaving" value={exp.reasonForLeaving} name="reasonForLeaving"
             onSave={(n, v) => handleSave("experienceDetails", n, v)} />
         </Section>
+
+        {/* ─── Reset Employee Password ─── */}
+        <PasswordResetSection employeeId={id} showToast={showToast} />
 
         {/* Documents */}
         {employee.documents?.length > 0 && (
