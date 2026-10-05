@@ -115,9 +115,15 @@ const leadSlice = createSlice({
       })
       .addCase(fetchLeads.fulfilled, (state, action) => {
         state.loading = false;
-        // Adjust these based on the exact API response structure
-        state.leads = action.payload.data?.leads || action.payload.data || action.payload;
-        state.pagination = action.payload.data?.pagination || null;
+        // API returns: { success, total, page, pages, data: [...] }
+        state.leads = action.payload.data || [];
+        state.pagination = action.payload.pages
+          ? {
+              total: action.payload.total,
+              page: action.payload.page,
+              pages: action.payload.pages,
+            }
+          : null;
       })
       .addCase(fetchLeads.rejected, (state, action) => {
         state.loading = false;
