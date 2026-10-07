@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://ephorsys-crm-backend.onrender.com",
-        // target: "http://localhost:8800",
+        // target: "https://ephorsys-crm-backend.onrender.com",
+        target: "http://localhost:8800",
         changeOrigin: true,
         secure: true,
         // secure: false,
