@@ -6,7 +6,8 @@ import {
   Settings,
   BriefcaseBusiness,
   BarChart3,
-  UserPlus
+  UserPlus,
+  Trophy,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -31,6 +32,11 @@ const NAV_ITEMS = [
     path: "/admin/leads",
     label: "Leads",
     icon: Users,
+  },
+  {
+    path: "/admin/happy-clients",
+    label: "Happy Clients",
+    icon: Trophy,
   },
   {
     path: "/admin/employees",

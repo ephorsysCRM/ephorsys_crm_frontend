@@ -9,7 +9,7 @@ import api from "../../services/api";
 
 const CALL_STATUSES = [
   "Connected", "Not Connected", "Switch Off / Not Reachable", 
-  "Blocked", "Wrong Number", "Denied", "Not Picked"
+  "Blocked", "Wrong Number", "Denied", "Not Picked", "Wrongly Inquired"
 ];
 
 const NOT_PICKED_STATUSES = [
@@ -87,9 +87,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.patch(`/lead/${leadId}/update-lead`, payload);
       if (res.data.success) {
         toast.success("Call logged successfully!");
-        fetchLead();
         onRefresh();
-        setCallData(prev => ({...prev, remarks: "", followUpDate: "", followUpTime: ""}));
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to log call.");
@@ -105,9 +104,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.post(`/lead/${leadId}/meeting`, meetingData);
       if (res.data.success) {
         toast.success("Meeting scheduled successfully!");
-        fetchLead();
         onRefresh();
-        setMeetingData({ meetingDate: "", meetingTime: "", type: "Online", address: "", meetingLink: "", remarks: "" });
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to schedule meeting.");
@@ -123,8 +121,8 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
       const res = await api.patch(`/lead/${leadId}/close`, closeData);
       if (res.data.success) {
         toast.success(`Lead marked as ${closeData.outcome}!`);
-        fetchLead();
         onRefresh();
+        onClose();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to close lead.");
@@ -135,11 +133,11 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
 
   const statusColors = {
     "New": "bg-blue-100 text-blue-700",
-    "Attempted": "bg-indigo-100 text-indigo-700",
+    "Attempted": "bg-violet-100 text-violet-700",
     "Interested": "bg-amber-100 text-amber-700",
     "Not Picked": "bg-slate-100 text-slate-700",
     "Meeting": "bg-purple-100 text-purple-700",
-    "Closed Won": "bg-emerald-100 text-emerald-700",
+    "Closed Won": "bg-[#74C316]/15 text-[#4a7d0d]",
     "Closed Lost": "bg-red-100 text-red-700",
     "Rejected": "bg-rose-100 text-rose-700"
   };
@@ -170,7 +168,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
 
           {loading || !lead ? (
             <div className="flex-1 flex flex-col items-center justify-center bg-white/50">
-              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-3" />
+              <Loader2 className="w-10 h-10 text-[#74C316] animate-spin mb-3" />
               <p className="text-slate-500 font-medium">Fetching lead history...</p>
             </div>
           ) : (
@@ -183,9 +181,9 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
                    <h3 className="text-xl font-bold text-slate-900 mb-1">{lead.fullName}</h3>
                    <div className="space-y-2 mt-4">
-                     <p className="text-sm text-slate-600 flex items-center gap-2"><Phone size={16} className="text-indigo-400"/> <span className="font-medium text-slate-800">{lead.mobileNumber}</span></p>
-                     <p className="text-sm text-slate-600 flex items-center gap-2"><Calendar size={16} className="text-indigo-400"/> Created: {new Date(lead.createdAt).toLocaleDateString('en-GB')}</p>
-                     <p className="text-sm text-slate-600 flex items-center gap-2"><MessageSquare size={16} className="text-indigo-400"/> Source: {lead.leadSource}</p>
+                     <p className="text-sm text-slate-600 flex items-center gap-2"><Phone size={16} className="text-[#74C316]"/> <span className="font-medium text-slate-800">{lead.mobileNumber}</span></p>
+                     <p className="text-sm text-slate-600 flex items-center gap-2"><Calendar size={16} className="text-[#74C316]"/> Created: {new Date(lead.createdAt).toLocaleDateString('en-GB')}</p>
+                     <p className="text-sm text-slate-600 flex items-center gap-2"><MessageSquare size={16} className="text-[#74C316]"/> Source: {lead.leadSource}</p>
                    </div>
                 </div>
 
@@ -204,7 +202,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                       .map((item, i) => (
                         <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                           {/* Icon */}
-                          <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-indigo-100 text-indigo-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-[#74C316]/12 text-[#4a7d0d] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             {item.callStatus ? <PhoneCall size={16}/> : <Handshake size={16}/>}
                           </div>
                           {/* Card */}
@@ -239,7 +237,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                 
                 {isClosed ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                     <CheckCircle2 className="w-16 h-16 text-emerald-400 mb-4" />
+                     <CheckCircle2 className="w-16 h-16 text-[#8fbf4a] mb-4" />
                      <h3 className="text-xl font-bold text-slate-800 mb-2">Lead Closed</h3>
                      <p className="text-slate-500 text-sm">This lead has been marked as <strong>{lead.leadStatus}</strong> and cannot be updated further.</p>
                   </div>
@@ -254,7 +252,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
-                          className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === tab.id ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                          className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === tab.id ? 'text-[#4a7d0d] border-b-2 border-[#74C316]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                         >
                           {tab.label}
                         </button>
@@ -268,7 +266,7 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                         <form onSubmit={handleCallUpdate} className="space-y-4">
                            <div>
                              <label className="block text-sm font-medium text-slate-700 mb-1">Call Outcome *</label>
-                             <select value={callData.callStatus} onChange={e=>setCallData({...callData, callStatus: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                             <select value={callData.callStatus} onChange={e=>setCallData({...callData, callStatus: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm">
                                {CALL_STATUSES.map(status => (
                                  <option key={status} value={status}>{status}</option>
                                ))}
@@ -276,14 +274,14 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                            </div>
 
                            {callData.callStatus === "Connected" && (
-                             <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-lg">
+                             <div className="p-3 bg-[#74C316]/8 border border-[#74C316]/20 rounded-lg">
                                <label className="block text-sm font-medium text-slate-800 mb-2">Is the client interested?</label>
                                <div className="flex items-center gap-6">
                                   <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                    <input type="radio" checked={callData.isInterested} onChange={() => setCallData({...callData, isInterested: true})} className="text-indigo-600 focus:ring-indigo-500" /> Yes
+                                    <input type="radio" checked={callData.isInterested} onChange={() => setCallData({...callData, isInterested: true})} className="text-[#74C316] focus:ring-[#74C316]" /> Yes
                                   </label>
                                   <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                    <input type="radio" checked={!callData.isInterested} onChange={() => setCallData({...callData, isInterested: false})} className="text-indigo-600 focus:ring-indigo-500" /> No
+                                    <input type="radio" checked={!callData.isInterested} onChange={() => setCallData({...callData, isInterested: false})} className="text-[#74C316] focus:ring-[#74C316]" /> No
                                   </label>
                                </div>
                              </div>
@@ -293,21 +291,21 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                              <div className="grid grid-cols-2 gap-4">
                                <div>
                                  <label className="block text-sm font-medium text-slate-700 mb-1">Follow-up Date *</label>
-                                 <input type="date" min={new Date().toISOString().split('T')[0]} required value={callData.followUpDate} onChange={e=>setCallData({...callData, followUpDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" />
+                                 <input type="date" min={new Date().toISOString().split('T')[0]} required value={callData.followUpDate} onChange={e=>setCallData({...callData, followUpDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" />
                                </div>
                                <div>
                                  <label className="block text-sm font-medium text-slate-700 mb-1">Follow-up Time *</label>
-                                 <input type="time" required value={callData.followUpTime} onChange={e=>setCallData({...callData, followUpTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" />
+                                 <input type="time" required value={callData.followUpTime} onChange={e=>setCallData({...callData, followUpTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" />
                                </div>
                              </div>
                            )}
 
                            <div>
                              <label className="block text-sm font-medium text-slate-700 mb-1">Call Remarks</label>
-                             <textarea rows="3" value={callData.remarks} onChange={e=>setCallData({...callData, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Summarize the conversation..."></textarea>
+                             <textarea rows="3" value={callData.remarks} onChange={e=>setCallData({...callData, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" placeholder="Summarize the conversation..."></textarea>
                            </div>
 
-                           <button type="submit" disabled={submitting} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+                           <button type="submit" disabled={submitting} className="w-full py-2.5 bg-[#74C316] hover:bg-[#5da011] text-white rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone size={16}/>}
                              Log Call
                            </button>
@@ -320,17 +318,17 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-slate-700 mb-1">Meeting Date *</label>
-                              <input type="date" min={new Date().toISOString().split('T')[0]} required value={meetingData.meetingDate} onChange={e=>setMeetingData({...meetingData, meetingDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" />
+                              <input type="date" min={new Date().toISOString().split('T')[0]} required value={meetingData.meetingDate} onChange={e=>setMeetingData({...meetingData, meetingDate: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" />
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-slate-700 mb-1">Meeting Time *</label>
-                              <input type="time" required value={meetingData.meetingTime} onChange={e=>setMeetingData({...meetingData, meetingTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" />
+                              <input type="time" required value={meetingData.meetingTime} onChange={e=>setMeetingData({...meetingData, meetingTime: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" />
                             </div>
                           </div>
 
                           <div>
                              <label className="block text-sm font-medium text-slate-700 mb-1">Meeting Type *</label>
-                             <select value={meetingData.type} onChange={e=>setMeetingData({...meetingData, type: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm">
+                             <select value={meetingData.type} onChange={e=>setMeetingData({...meetingData, type: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm">
                                <option value="Online">Online (Video/Audio)</option>
                                <option value="Offline">Offline (In Person)</option>
                              </select>
@@ -339,21 +337,21 @@ export default function LeadDetailModal({ leadId, onClose, onRefresh }) {
                           {meetingData.type === "Online" ? (
                             <div>
                               <label className="block text-sm font-medium text-slate-700 mb-1">Meeting Link *</label>
-                              <input type="url" required value={meetingData.meetingLink} onChange={e=>setMeetingData({...meetingData, meetingLink: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="https://meet.google.com/..." />
+                              <input type="url" required value={meetingData.meetingLink} onChange={e=>setMeetingData({...meetingData, meetingLink: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" placeholder="https://meet.google.com/..." />
                             </div>
                           ) : (
                             <div>
                               <label className="block text-sm font-medium text-slate-700 mb-1">Address / Location *</label>
-                              <input type="text" required value={meetingData.address} onChange={e=>setMeetingData({...meetingData, address: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Client Office Address..." />
+                              <input type="text" required value={meetingData.address} onChange={e=>setMeetingData({...meetingData, address: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" placeholder="Client Office Address..." />
                             </div>
                           )}
 
                           <div>
                              <label className="block text-sm font-medium text-slate-700 mb-1">Remarks</label>
-                             <textarea rows="2" value={meetingData.remarks} onChange={e=>setMeetingData({...meetingData, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Any specific agenda items?"></textarea>
+                             <textarea rows="2" value={meetingData.remarks} onChange={e=>setMeetingData({...meetingData, remarks: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#74C316]/50 focus:border-[#74C316] text-sm" placeholder="Any specific agenda items?"></textarea>
                           </div>
 
-                          <button type="submit" disabled={submitting} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+                          <button type="submit" disabled={submitting} className="w-full py-2.5 bg-[#74C316] hover:bg-[#5da011] text-white rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar size={16}/>}
                              Schedule Meeting
                            </button>
