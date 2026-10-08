@@ -389,330 +389,42 @@ const Login = () => {
   };
 
   return (
-    <>
-      <style>{`
-        /* ═══════════════════════════════════════════════════════════════════
-           LOGIN PAGE STYLES
-        ═══════════════════════════════════════════════════════════════════ */
-        .login-page {
-          min-height: 100vh;
-          background: #f1f5f4;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1rem;
-        }
-
-        .login-card {
-          width: 100%;
-          max-width: 420px;
-          background: linear-gradient(145deg, #18181b, #09090b);
-          border: 1px solid #27272a;
-          border-radius: 20px;
-          box-shadow: 0 25px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);
-          overflow: hidden;
-        }
-
-        /* Header */
-        .login-header {
-          padding: 2.25rem 2rem 1.5rem;
-          text-align: center;
-          background: linear-gradient(180deg, rgba(16,74,23,0.15) 0%, transparent 100%);
-          border-bottom: 1px solid #27272a;
-        }
-        .login-icon-ring {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          background: rgba(47,124,57,0.12);
-          border: 1.5px solid rgba(47,124,57,0.35);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 1rem;
-          color: #4ade80;
-        }
-        .login-title { margin: 0 0 0.35rem; color: #fff; font-size: 1.35rem; font-weight: 700; }
-        .login-subtitle { margin: 0; color: #71717a; font-size: 0.825rem; }
-
-        /* Role toggles */
-        .role-toggles {
-          display: flex;
-          gap: 0.5rem;
-          padding: 1.25rem 1.75rem 0;
-        }
-        .role-btn {
-          flex: 1;
-          padding: 0.6rem 1rem;
-          border-radius: 10px;
-          border: 1.5px solid #27272a;
-          background: #27272a;
-          color: #a1a1aa;
-          font-size: 0.825rem;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.4rem;
-          transition: all 0.2s ease;
-        }
-        .role-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
-        .role-btn.active {
-          background: linear-gradient(135deg, #104a17, #2f7c39);
-          border-color: #2f7c39;
-          color: #fff;
-          box-shadow: 0 4px 14px rgba(47,124,57,0.3);
-        }
-
-        /* Form */
-        .login-form { padding: 1.5rem 1.75rem 2rem; display: flex; flex-direction: column; gap: 1.1rem; }
-        .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
-        .form-label { color: #a1a1aa; font-size: 0.8rem; font-weight: 500; }
-        .form-input-wrap { position: relative; }
-        .form-input-icon {
-          position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%);
-          color: #52525b; pointer-events: none;
-        }
-        .form-input {
-          width: 100%; box-sizing: border-box;
-          padding: 0.7rem 0.875rem 0.7rem 2.5rem;
-          background: #27272a; border: 1.5px solid #3f3f46; border-radius: 10px;
-          color: #f4f4f5; font-size: 0.875rem; font-family: inherit;
-          transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-        }
-        .form-input::placeholder { color: #52525b; }
-        .form-input:focus { border-color: #2f7c39; box-shadow: 0 0 0 3px rgba(47,124,57,0.18); }
-        .form-input.pr { padding-right: 2.75rem; }
-        .form-eye-btn {
-          position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-          background: none; border: none; cursor: pointer; color: #52525b; padding: 0.2rem;
-          display: flex; align-items: center; transition: color 0.2s;
-        }
-        .form-eye-btn:hover { color: #a1a1aa; }
-        .form-error { color: #f87171; font-size: 0.75rem; }
-
-        /* Forgot password link */
-        .forgot-link {
-          align-self: flex-end; margin-top: -0.4rem;
-          background: none; border: none; cursor: pointer;
-          color: #4ade80; font-size: 0.775rem; font-family: inherit;
-          padding: 0; text-decoration: none; transition: color 0.2s;
-        }
-        .forgot-link:hover { color: #86efac; text-decoration: underline; }
-
-        /* Submit button */
-        .login-btn {
-          width: 100%; padding: 0.8rem; border: none; border-radius: 10px;
-          background: linear-gradient(135deg, #104a17, #2f7c39);
-          color: #fff; font-size: 0.9rem; font-weight: 600; font-family: inherit;
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          gap: 0.5rem; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-          box-shadow: 0 4px 18px rgba(47,124,57,0.35); margin-top: 0.25rem;
-        }
-        .login-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 22px rgba(47,124,57,0.45); }
-        .login-btn:active:not(:disabled) { transform: translateY(0); }
-        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-spinner {
-          width: 18px; height: 18px; border-radius: 50%;
-          border: 2.5px solid rgba(255,255,255,0.2); border-top-color: #fff;
-          animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ═══════════════════════════════════════════════════════════════════
-           FORGOT PASSWORD MODAL STYLES
-        ═══════════════════════════════════════════════════════════════════ */
-        .fp-overlay {
-          position: fixed; inset: 0; z-index: 9999;
-          background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
-          display: flex; align-items: center; justify-content: center; padding: 1rem;
-          animation: fp-fade-in 0.2s ease;
-        }
-        @keyframes fp-fade-in { from { opacity: 0; } to { opacity: 1; } }
-
-        .fp-modal {
-          width: 100%; max-width: 420px;
-          background: linear-gradient(160deg, #1c1c1e, #111113);
-          border: 1px solid #2d2d30; border-radius: 20px;
-          box-shadow: 0 32px 80px rgba(0,0,0,0.5);
-          padding: 2rem; position: relative;
-          animation: fp-slide-up 0.25s ease;
-        }
-        @keyframes fp-slide-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-        .fp-close {
-          position: absolute; top: 1rem; right: 1rem;
-          width: 30px; height: 30px; border-radius: 50%;
-          background: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
-          font-size: 1.1rem; line-height: 1; cursor: pointer; display: flex;
-          align-items: center; justify-content: center; transition: all 0.2s;
-        }
-        .fp-close:hover { background: #3f3f46; color: #fff; }
-
-        /* Steps indicator */
-        .fp-steps {
-          display: flex; align-items: center; justify-content: center;
-          gap: 0; margin-bottom: 1.75rem;
-        }
-        .fp-step { display: flex; align-items: center; gap: 0; }
-        .fp-step-circle {
-          width: 28px; height: 28px; border-radius: 50%;
-          border: 2px solid #3f3f46; color: #52525b; font-size: 0.75rem; font-weight: 600;
-          display: flex; align-items: center; justify-content: center;
-          transition: all 0.3s ease;
-        }
-        .fp-step-active { border-color: #2f7c39; color: #4ade80; background: rgba(47,124,57,0.12); }
-        .fp-step-done { border-color: #2f7c39; background: #2f7c39; color: #fff; }
-        .fp-step-label { font-size: 0.7rem; color: #71717a; margin: 0 0.5rem; white-space: nowrap; }
-        .fp-step-line { width: 28px; height: 2px; background: #27272a; border-radius: 1px; }
-        .fp-step-line-done { background: #2f7c39; }
-
-        /* Form layout */
-        .fp-form { display: flex; flex-direction: column; gap: 1.1rem; }
-        .fp-icon-wrap {
-          width: 56px; height: 56px; border-radius: 14px;
-          display: flex; align-items: center; justify-content: center;
-          margin: 0 auto 0.5rem;
-        }
-        .fp-icon-blue { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
-        .fp-icon-amber { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
-        .fp-icon-green { background: rgba(47,124,57,0.12); color: #4ade80; border: 1px solid rgba(47,124,57,0.3); }
-
-        .fp-title { margin: 0 0 0.3rem; color: #fff; font-size: 1.2rem; font-weight: 700; text-align: center; }
-        .fp-subtitle { margin: 0; color: #71717a; font-size: 0.825rem; text-align: center; line-height: 1.55; }
-        .fp-email-highlight { color: #a1a1aa; font-style: normal; }
-
-        .fp-field { display: flex; flex-direction: column; gap: 0.4rem; }
-        .fp-label { color: #a1a1aa; font-size: 0.8rem; font-weight: 500; }
-        .fp-input-wrap { position: relative; }
-        .fp-input-icon {
-          position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%);
-          color: #52525b; pointer-events: none;
-        }
-        .fp-input {
-          width: 100%; box-sizing: border-box;
-          padding: 0.7rem 0.875rem 0.7rem 2.5rem;
-          background: #27272a; border: 1.5px solid #3f3f46; border-radius: 10px;
-          color: #f4f4f5; font-size: 0.875rem; font-family: inherit;
-          transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-        }
-        .fp-input::placeholder { color: #52525b; }
-        .fp-input:focus { border-color: #2f7c39; box-shadow: 0 0 0 3px rgba(47,124,57,0.18); }
-        .fp-input-pr { padding-right: 2.75rem; }
-        .fp-input-error { border-color: #ef4444 !important; }
-        .fp-eye-btn {
-          position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-          background: none; border: none; cursor: pointer; color: #52525b;
-          display: flex; align-items: center; transition: color 0.2s;
-        }
-        .fp-eye-btn:hover { color: #a1a1aa; }
-        .fp-error-msg { color: #f87171; font-size: 0.75rem; }
-
-        /* Password strength bar */
-        .fp-strength-bar {
-          height: 3px; background: #27272a; border-radius: 2px; margin-top: 0.4rem; overflow: hidden;
-        }
-        .fp-strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
-        .fp-strength-weak { width: 33%; background: #ef4444; }
-        .fp-strength-medium { width: 66%; background: #f59e0b; }
-        .fp-strength-strong { width: 100%; background: #22c55e; }
-
-        /* OTP row */
-        .fp-otp-row {
-          display: flex; gap: 0.5rem; justify-content: center;
-        }
-        .fp-otp-box {
-          width: 48px; height: 54px; text-align: center;
-          background: #27272a; border: 1.5px solid #3f3f46; border-radius: 10px;
-          color: #f4f4f5; font-size: 1.3rem; font-weight: 700; font-family: inherit;
-          outline: none; transition: all 0.2s; caret-color: #4ade80;
-        }
-        .fp-otp-box:focus { border-color: #2f7c39; box-shadow: 0 0 0 3px rgba(47,124,57,0.2); background: #1e2a1f; }
-        .fp-otp-filled { border-color: #2f7c39; color: #4ade80; }
-
-        /* Resend row */
-        .fp-resend-row { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .fp-resend-text { color: #71717a; font-size: 0.8rem; }
-        .fp-resend-btn {
-          background: none; border: none; cursor: pointer; color: #4ade80; font-size: 0.8rem;
-          font-family: inherit; display: flex; align-items: center; gap: 0.3rem; padding: 0;
-          transition: color 0.2s; font-weight: 500;
-        }
-        .fp-resend-btn:hover:not(.fp-resend-disabled) { color: #86efac; }
-        .fp-resend-disabled { color: #52525b !important; cursor: not-allowed; }
-
-        /* Buttons */
-        .fp-btn-primary {
-          width: 100%; padding: 0.8rem; border: none; border-radius: 10px;
-          background: linear-gradient(135deg, #104a17, #2f7c39);
-          color: #fff; font-size: 0.9rem; font-weight: 600; font-family: inherit;
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          gap: 0.5rem; transition: opacity 0.2s, transform 0.15s;
-          box-shadow: 0 4px 18px rgba(47,124,57,0.3); margin-top: 0.25rem;
-        }
-        .fp-btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-        .fp-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .fp-btn-ghost {
-          width: 100%; padding: 0.65rem; border: 1.5px solid #3f3f46; border-radius: 10px;
-          background: transparent; color: #71717a; font-size: 0.825rem; font-weight: 500;
-          font-family: inherit; cursor: pointer; display: flex; align-items: center;
-          justify-content: center; gap: 0.4rem; transition: all 0.2s;
-        }
-        .fp-btn-ghost:hover { border-color: #52525b; color: #a1a1aa; background: #27272a; }
-        .fp-spinner {
-          width: 18px; height: 18px; border-radius: 50%;
-          border: 2.5px solid rgba(255,255,255,0.25); border-top-color: #fff;
-          animation: spin 0.7s linear infinite; display: inline-block;
-        }
-
-        /* Success state */
-        .fp-success { align-items: center; text-align: center; }
-        .fp-success-icon {
-          width: 80px; height: 80px; border-radius: 50%;
-          background: rgba(34,197,94,0.12); border: 2px solid rgba(34,197,94,0.3);
-          color: #4ade80; display: flex; align-items: center; justify-content: center;
-          margin: 0 auto 0.5rem; animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes pop-in { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-          .fp-otp-box { width: 40px; height: 46px; font-size: 1.1rem; }
-          .fp-modal { padding: 1.5rem; }
-        }
-      `}</style>
-
-      <div className="login-page">
-        <div className="login-card">
-          {/* Header */}
-          <div className="login-header">
-            <div className="login-icon-ring">
-              <ShieldCheck size={28} />
-            </div>
-            <h1 className="login-title">CRM Portal Login</h1>
-            <p className="login-subtitle">Sign in to manage your leads and pipeline</p>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-gradient-to-br from-zinc-900 to-black border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+        
+        {/* Header */}
+        <div className="p-8 text-center pb-6">
+          <div className="mx-auto w-16 h-16 bg-[#74C316]/10 rounded-full flex items-center justify-center mb-4">
+            <ShieldCheck className="w-8 h-8 text-[#8fbf4a]" />
           </div>
 
-          {/* Role Toggles */}
-          <div className="role-toggles">
-            <button
-              type="button"
-              className={`role-btn ${roleMode === "employee" ? "active" : ""}`}
-              onClick={() => setRoleMode("employee")}
-            >
-              <Users size={15} />
-              Employee
-            </button>
-            <button
-              type="button"
-              className={`role-btn ${roleMode === "admin" ? "active" : ""}`}
-              onClick={() => setRoleMode("admin")}
-            >
-              <Lock size={15} />
-              Admin
-            </button>
-          </div>
+        {/* Role Toggles */}
+        <div className="px-8 flex space-x-2 mb-6">
+          <button 
+            type="button"
+            onClick={() => setRoleMode("employee")}
+            className={`flex-1 py-2.5 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all ${
+              roleMode === "employee" 
+                ? "bg-[#74C316] text-white shadow-lg shadow-[#74C316]/30" 
+                : "bg-slate-800/50 text-white hover:bg-[#74C316]/20"
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Employee</span>
+          </button>
+          <button 
+            type="button"
+            onClick={() => setRoleMode("admin")}
+            className={`flex-1 py-2.5 rounded-lg flex items-center justify-center space-x-2 text-sm font-medium transition-all ${
+              roleMode === "admin" 
+                ? "bg-[#74C316] text-white shadow-lg shadow-[#74C316]/30" 
+                : "bg-slate-800/50 text-white hover:bg-[#74C316]/20"
+            }`}
+          >
+            <Lock className="w-4 h-4" />
+            <span>Admin</span>
+          </button>
+        </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="login-form">
@@ -730,7 +442,12 @@ const Login = () => {
                   placeholder={roleMode === "admin" ? "admin@company.com" : "employee@company.com"}
                 />
               </div>
-              {errors.email && <span className="form-error">{errors.email.message}</span>}
+              <input
+                type="email"
+                {...register("email", { required: "Email is required" })}
+                className="block w-full pl-10 pr-3 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#74C316] focus:border-transparent transition-all"
+                placeholder={roleMode === "admin" ? "admin@company.com" : "employee@company.com"}
+              />
             </div>
 
             {/* Password */}
@@ -766,11 +483,43 @@ const Login = () => {
               </button>
             )}
 
-            <button type="submit" className="login-btn" disabled={isLoading}>
-              {isLoading ? <span className="btn-spinner" /> : "Sign In"}
-            </button>
-          </form>
-        </div>
+    <input
+      type={showPassword ? "text" : "password"}
+      {...register("password", { required: "Password is required" })}
+      className="block w-full pl-10 pr-12 py-2.5 border border-slate-700 rounded-xl bg-slate-800/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#74C316] focus:border-transparent transition-all"
+      placeholder="••••••••"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+    >
+      {showPassword ? (
+        <EyeOff className="h-5 w-5" />
+      ) : (
+        <Eye className="h-5 w-5" />
+      )}
+    </button>
+  </div>
+
+  {errors.password && (
+    <span className="text-red-400 text-xs mt-1 block">
+      {errors.password.message}
+    </span>
+  )}
+</div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full mt-6 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-[#74C316] hover:bg-[#63A613] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#74C316] focus:ring-offset-slate-900 transition-all disabled:opacity-50 flex justify-center items-center"
+          >
+            {isLoading ? (
+               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+            ) : "Sign In"}
+          </button>
+        </form>
       </div>
 
       {/* Forgot Password Modal */}

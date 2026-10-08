@@ -15,7 +15,7 @@ import { logoutSuccess } from "../../redux/features/auth/authSlice";
 import Modal from "../../components/ui/Modal";
 import LogoutModal from "../../components/Modals/LogoutModal";
 
-const TopBar = ({ setSidebarOpen }) => {
+const TopBar = ({ setSidebarOpen, title = "Dashboard Overview", subtitle = "" }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -83,13 +83,14 @@ const TopBar = ({ setSidebarOpen }) => {
         bg-white
         border-b border-slate-200
         px-4 md:px-6
-        h-16
+        py-3
         flex items-center justify-between
         shrink-0
+        gap-4
       "
     >
       {/* Left */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3 min-w-0">
         {/* Mobile Menu */}
         <motion.button
           whileTap={{ scale: 0.92 }}
@@ -102,6 +103,8 @@ const TopBar = ({ setSidebarOpen }) => {
             text-slate-500
             hover:bg-slate-50
             transition
+            shrink-0
+            mt-0.5
           "
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
@@ -109,28 +112,47 @@ const TopBar = ({ setSidebarOpen }) => {
           <Menu size={18} />
         </motion.button>
 
-        {/* Brand */}
-        <motion.span
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 0.4,
-            delay: 0.1,
-            ease: "easeOut",
-          }}
-          className="
-            text-[15px]
-            font-semibold
-            tracking-widest
-            text-[var(--primary)]
-          "
-        >
-          EPHORSYS
-        </motion.span>
+        {/* Greeting + Title + Subtitle */}
+        <div className="min-w-0">
+          <motion.p
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.4,
+              delay: 0.1,
+              ease: "easeOut",
+            }}
+            className="flex items-center gap-1.5 text-[17px] font-semibold text-[#74C316] mb-1"
+          >
+            Welcome back,{" "}
+            <span className="text-slate-800 font-semibold">
+              {user?.firstName || "there"}
+            </span>
+            <span className="inline-block origin-[70%_70%] animate-[wave_1.5s_ease-in-out_1]">
+              👋
+            </span>
+          </motion.p>
+
+
+          {subtitle ? (
+            <motion.p
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.4,
+                delay: 0.2,
+                ease: "easeOut",
+              }}
+              className="hidden sm:block text-[13px] text-slate-500 mt-0.5"
+            >
+              {subtitle}
+            </motion.p>
+          ) : null}
+        </div>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex items-center gap-2 md:gap-3 shrink-0">
         {/* Calendar */}
         <div
           className="
@@ -186,11 +208,11 @@ const TopBar = ({ setSidebarOpen }) => {
           >
             {/* User Info */}
             <div className="hidden sm:block text-right">
-              <p className="text-[13px] font-medium text-slate-800 leading-tight">
+              <p className="text-[13px] font-bold text-[#74C316] leading-tight ">
                 {user?.firstName || user?.lastName || "User"}
               </p>
 
-              <p className="text-[11px] uppercase tracking-wider text-slate-400 leading-tight">
+              <p className="text-[11px] uppercase tracking-wider text-black Price return into type of types of relong. leading-tight">
                 BDE
               </p>
             </div>
@@ -260,18 +282,18 @@ const TopBar = ({ setSidebarOpen }) => {
                   </div>
 
                   <div>
-                    <p className="text-[13px] font-medium text-slate-800 leading-tight">
+                    <p className="text-[13px] font-bold text-black leading-tight">
                       {user?.firstName || user?.name || "User"}
                     </p>
 
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-[#74C316] font-bold ">
                       {user?.officialEmail || user?.email || ""}
                     </p>
                   </div>
                 </div>
 
                 {/* Profile Button */}
-                <div className="p-1.5">
+                {/* <div className="p-1.5">
                   <motion.button
                     whileHover={{
                       backgroundColor: "#f8fafc",
@@ -290,44 +312,45 @@ const TopBar = ({ setSidebarOpen }) => {
                     <User size={15} className="text-slate-400" />
                     My Profile
                   </motion.button>
-                </div>
+                </div> */}
 
                 {/* Logout */}
-                <div className="border-t border-slate-100 p-1.5">
-  <motion.button
-    onClick={() => setLogoutOpen(true)}
-    whileHover={{
-      backgroundColor: "#fef2f2",
-    }}
-    whileTap={{ scale: 0.98 }}
-    className="
-      w-full
-      flex items-center gap-2.5
-      px-3 py-2.5
-      rounded-lg
-      text-[13px]
-      text-red-500
-      transition
-      cursor-pointer
-    "
-  >
-    <LogOut size={15} />
-    Sign out
-  </motion.button>
-</div>
+                <div className="border-t border-slate-100 p-1.5 ">
+                  <motion.button
+                    onClick={() => setLogoutOpen(true)}
+                    whileHover={{
+                      backgroundColor: "#fef2f2",
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className="
+                      w-full
+                      flex items-center gap-2.5
+                      px-3 py-2.5
+                      rounded-lg
+                      text-[13px]
+                      text-red-500
+                      transition
+                      cursor-pointer
+                    
+                    "
+                  >
+                    <LogOut size={15} />
+                    Sign out
+                  </motion.button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
       <Modal
-  isOpen={logoutOpen}
-  onClose={() => setLogoutOpen(false)}
-  title="Logout"
-  size="sm"
->
-  <LogoutModal onClose={() => setLogoutOpen(false)} />
-</Modal>
+        isOpen={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        title="Logout"
+        size="sm"
+      >
+        <LogoutModal onClose={() => setLogoutOpen(false)} />
+      </Modal>
     </motion.header>
   );
 };
